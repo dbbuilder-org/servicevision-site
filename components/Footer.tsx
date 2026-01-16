@@ -8,6 +8,7 @@ const navigation = {
   ],
   company: [
     { name: "About Us", href: "/about" },
+    { name: "AI Capabilities", href: "/ai" },
     { name: "Blog", href: "/blog" },
     { name: "Contact", href: "/contact" },
   ],

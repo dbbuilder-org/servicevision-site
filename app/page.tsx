@@ -44,23 +44,42 @@ const stats = [
 ];
 
 const terminalQuestions = [
-  "Where do I even begin?",
-  "How can I finish this project?",
-  "Who can I trust to help me?",
-  "How do I make this SOC 2 compliant?",
-  "Can AI actually help my business?",
-  "Who knows best practices best?",
-  "How do I scale without breaking things?",
-  "Where do I find engineers who care?",
+  "Where do I begin?",
+  "How do I finish this?",
+  "Who can I trust?",
+  "Is this SOC 2 compliant?",
+  "Can AI help my business?",
+  "Who knows best practices?",
+  "How do I scale this?",
+  "Who actually cares?",
+  "What about compliance?",
+  "Is this even possible?",
 ];
 
+// Shuffle array helper
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 export default function Home() {
+  const [questions, setQuestions] = useState<string[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(true);
 
+  // Randomize questions on mount
   useEffect(() => {
-    const question = terminalQuestions[currentQuestion];
+    setQuestions(shuffleArray(terminalQuestions));
+  }, []);
+
+  useEffect(() => {
+    if (questions.length === 0) return;
+    const question = questions[currentQuestion];
 
     if (isTyping) {
       if (displayedText.length < question.length) {
@@ -81,11 +100,11 @@ export default function Home() {
         }, 30);
         return () => clearTimeout(timeout);
       } else {
-        setCurrentQuestion((prev) => (prev + 1) % terminalQuestions.length);
+        setCurrentQuestion((prev) => (prev + 1) % questions.length);
         setIsTyping(true);
       }
     }
-  }, [displayedText, isTyping, currentQuestion]);
+  }, [displayedText, isTyping, currentQuestion, questions]);
 
   return (
     <div className="bg-[#0a0a0a] min-h-screen">
@@ -103,19 +122,15 @@ export default function Home() {
             {/* Terminal Window */}
             <div className="terminal-window animate-terminal-glow">
               <div className="terminal-header">
-                <div className="flex gap-2">
-                  <div className="terminal-dot terminal-dot-red" />
-                  <div className="terminal-dot terminal-dot-yellow" />
-                  <div className="terminal-dot terminal-dot-green" />
-                </div>
-                <span className="ml-4 text-xs text-gray-500 font-mono">you@startup ~ </span>
+                <span className="text-xs text-emerald-400 font-mono">SERVICEVISION</span>
+                <span className="text-xs text-gray-600 font-mono ml-auto">v1.0</span>
               </div>
 
               <div className="terminal-body">
-                <div className="text-gray-500 text-sm mb-4 font-mono">$ thinking about your next project...</div>
+                <div className="text-gray-500 text-sm mb-4 font-mono">C:\projects&gt; thinking...</div>
                 <div className="flex items-start gap-2">
                   <span className="phosphor-text text-2xl sm:text-3xl lg:text-4xl font-bold font-mono">&gt;</span>
-                  <span className="phosphor-text text-2xl sm:text-3xl lg:text-4xl font-bold font-mono">
+                  <span className="phosphor-text text-2xl sm:text-3xl lg:text-4xl font-bold font-mono whitespace-nowrap">
                     {displayedText}
                     <span className="inline-block w-3 sm:w-4 h-7 sm:h-9 bg-emerald-400 ml-1 animate-blink" />
                   </span>
@@ -246,12 +261,8 @@ export default function Home() {
           {/* Capabilities Grid */}
           <div className="terminal-window max-w-4xl mx-auto">
             <div className="terminal-header">
-              <div className="flex gap-2">
-                <div className="terminal-dot terminal-dot-red" />
-                <div className="terminal-dot terminal-dot-yellow" />
-                <div className="terminal-dot terminal-dot-green" />
-              </div>
-              <span className="ml-4 text-xs text-gray-500 font-mono">capabilities.sh</span>
+              <span className="text-xs text-amber-400 font-mono">CAPABILITIES.SH</span>
+              <span className="text-xs text-gray-600 font-mono ml-auto">running...</span>
             </div>
             <div className="terminal-body space-y-3">
               {capabilities.map((cap, index) => (
@@ -283,7 +294,7 @@ export default function Home() {
         <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
           <div className="terminal-window max-w-3xl mx-auto text-center">
             <div className="terminal-header justify-center">
-              <span className="text-xs text-gray-500 font-mono">impact.log</span>
+              <span className="text-xs text-emerald-400 font-mono">IMPACT.LOG</span>
             </div>
             <div className="p-8 sm:p-12">
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full border-2 border-emerald-400 mb-6">
