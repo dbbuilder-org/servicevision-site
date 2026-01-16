@@ -139,7 +139,7 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle }:
                   We built this site—interface, games, backend—in <span className="text-white font-bold">under 12 hours</span> with one senior engineer and our AI agents trained on our best practices.
                 </p>
                 <p className="text-white font-semibold text-sm md:text-base mt-2">
-                  Imagine what 12 hours could do to revolutionize your <span className={`inline-block min-w-[70px] text-purple-400 transition-all duration-200 ${isRotating ? "opacity-90" : "opacity-100"}`}>{rotatingWords[currentWordIndex]}</span>.
+                  Imagine what 12 hours with <span className="text-purple-400">ServiceVision</span> could do to revolutionize your <span className={`inline-block min-w-[70px] text-purple-400 transition-all duration-200 ${isRotating ? "opacity-90" : "opacity-100"}`}>{rotatingWords[currentWordIndex]}</span>.
                 </p>
               </div>
 
