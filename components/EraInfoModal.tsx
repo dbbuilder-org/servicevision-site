@@ -105,9 +105,9 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle }:
                   </div>
                   <div>
                     <h2 className="text-lg md:text-xl font-bold text-white">
-                      Remember {eraYear}?
+                      Remember {eraName}?
                     </h2>
-                    <p className="text-xs text-purple-400 font-mono">{eraName}</p>
+                    <p className="text-xs text-purple-400 font-mono">{eraYear}</p>
                   </div>
                 </div>
 
@@ -137,13 +137,11 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle }:
 
               {/* Center: Main Copy */}
               <div className="flex-1 min-w-0">
-                <p className="text-gray-300 text-sm md:text-base leading-relaxed">
+                <p className="text-emerald-400 text-sm md:text-base leading-relaxed">
                   We built this site—interface, games, backend—in <span className="text-white font-bold">under 12 hours</span> with one senior engineer and our AI agents trained on our best practices.
                 </p>
                 <p className="text-white font-semibold text-base md:text-lg mt-2">
-                  Imagine what 12 hours could do to revolutionize your{" "}
-                  <span className={`inline-block min-w-[90px] text-purple-400 transition-all duration-200 ${isRotating ? "opacity-90" : "opacity-100"}`}>
-                    {rotatingWords[currentWordIndex]}</span>.
+                  Imagine what 12 hours could do to revolutionize your <span className={`inline-block min-w-[80px] text-purple-400 transition-all duration-200 ${isRotating ? "opacity-90" : "opacity-100"}`}>{rotatingWords[currentWordIndex]}</span>.
                 </p>
               </div>
 
