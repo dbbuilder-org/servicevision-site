@@ -93,28 +93,13 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle }:
           <div className="h-1 bg-gradient-to-r from-purple-600 via-purple-400 to-purple-600" />
 
           <div className="p-5 md:p-6">
-            {/* Horizontal Layout */}
-            <div className="flex flex-col lg:flex-row lg:items-center gap-5 lg:gap-8">
+            {/* 1/3 - 1/3 - 1/3 Grid Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-6">
 
-              {/* Left: Header + Toggle */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 lg:gap-6 shrink-0">
-                {/* Icon + Title */}
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/30 to-purple-600/20 border border-purple-500/30 flex items-center justify-center shadow-lg shadow-purple-500/20">
-                    <span className="text-2xl">⚡</span>
-                  </div>
-                  <div>
-                    <h2 className="text-lg md:text-xl font-bold text-white">
-                      Remember the {eraName}?
-                    </h2>
-                    <p className="text-xs text-purple-400 font-mono">{eraYear}</p>
-                  </div>
-                </div>
-
-                {/* Toggle */}
-                <div className="flex flex-col items-center gap-1">
-                  <span className="text-[10px] text-gray-500 uppercase tracking-wider">Toggle between eras</span>
-                  <div className="flex items-center gap-3 bg-black/30 rounded-full px-4 py-2 border border-white/5">
+              {/* Left 1/3: Toggle */}
+              <div className="flex flex-col justify-center items-center lg:items-start">
+                <span className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Toggle between eras</span>
+                <div className="flex items-center gap-3 bg-black/30 rounded-full px-4 py-2 border border-white/5">
                   <span className={`text-sm font-mono transition-colors ${!showModern ? "text-white font-semibold" : "text-gray-500"}`}>
                     {eraYear}
                   </span>
@@ -137,28 +122,39 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle }:
                 </div>
               </div>
 
-              {/* Center: Main Copy */}
-              <div className="flex-1 min-w-0">
-                <p className="text-emerald-400 text-sm md:text-base leading-relaxed">
+              {/* Center 1/3: Header + Copy */}
+              <div className="flex flex-col justify-center">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/30 to-purple-600/20 border border-purple-500/30 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                    <span className="text-xl">⚡</span>
+                  </div>
+                  <div>
+                    <h2 className="text-base md:text-lg font-bold text-white">
+                      Remember the {eraName}?
+                    </h2>
+                    <p className="text-[10px] text-purple-400 font-mono">{eraYear}</p>
+                  </div>
+                </div>
+                <p className="text-emerald-400 text-sm leading-relaxed">
                   We built this site—interface, games, backend—in <span className="text-white font-bold">under 12 hours</span> with one senior engineer and our AI agents trained on our best practices.
                 </p>
-                <p className="text-white font-semibold text-base md:text-lg mt-2">
-                  Imagine what 12 hours could do to revolutionize your <span className={`inline-block min-w-[80px] text-purple-400 transition-all duration-200 ${isRotating ? "opacity-90" : "opacity-100"}`}>{rotatingWords[currentWordIndex]}</span>.
+                <p className="text-white font-semibold text-sm md:text-base mt-2">
+                  Imagine what 12 hours could do to revolutionize your <span className={`inline-block min-w-[70px] text-purple-400 transition-all duration-200 ${isRotating ? "opacity-90" : "opacity-100"}`}>{rotatingWords[currentWordIndex]}</span>.
                 </p>
               </div>
 
-              {/* Right: Actions */}
-              <div className="flex flex-row lg:flex-col gap-3 shrink-0">
+              {/* Right 1/3: Actions */}
+              <div className="flex flex-col justify-center gap-3">
                 <Link
                   href="/contact"
-                  className="flex-1 lg:flex-none bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-medium px-6 py-3 rounded-xl text-center transition-all shadow-lg shadow-purple-500/30 whitespace-nowrap"
+                  className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-medium px-6 py-3 rounded-xl text-center transition-all shadow-lg shadow-purple-500/30 whitespace-nowrap"
                   onClick={handleDismiss}
                 >
                   Start a Conversation
                 </Link>
                 <button
                   onClick={handleDismiss}
-                  className="flex-1 lg:flex-none bg-white/5 hover:bg-white/10 text-gray-300 font-medium px-6 py-3 rounded-xl text-center transition-colors border border-white/10 whitespace-nowrap"
+                  className="bg-white/5 hover:bg-white/10 text-gray-300 font-medium px-6 py-3 rounded-xl text-center transition-colors border border-white/10 whitespace-nowrap"
                 >
                   Explore First
                 </button>
