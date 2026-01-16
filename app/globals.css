@@ -11,6 +11,11 @@
   --color-secondary-dark: #d97706;
   --color-secondary-light: #fef3c7;
 
+  /* AI/Purple theme */
+  --color-ai-purple: #a855f7;
+  --color-ai-purple-dark: #9333ea;
+  --color-ai-purple-light: #c084fc;
+
   /* Terminal colors */
   --color-terminal-bg: #0a0a0a;
   --color-terminal-surface: #111111;
@@ -128,6 +133,14 @@ html {
   background-clip: text;
 }
 
+/* AI Purple gradient */
+.gradient-text-purple {
+  background: linear-gradient(135deg, #a855f7 0%, #c084fc 50%, #e879f9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* Terminal window styling */
 .terminal-window {
   background: #111111;
@@ -201,6 +214,14 @@ html {
   text-shadow:
     0 0 5px rgba(245, 158, 11, 0.5),
     0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+/* AI Purple glow text */
+.phosphor-text-purple {
+  color: #a855f7;
+  text-shadow:
+    0 0 5px rgba(168, 85, 247, 0.5),
+    0 0 10px rgba(168, 85, 247, 0.3);
 }
 
 /* Terminal card */
@@ -298,6 +319,18 @@ html {
   background: #f59e0b;
   color: #0a0a0a;
   box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+}
+
+/* AI Purple button */
+.btn-retro-purple {
+  border-color: #a855f7;
+  color: #a855f7;
+}
+
+.btn-retro-purple:hover {
+  background: #a855f7;
+  color: #0a0a0a;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
 }
 
 /* Card hover effect */

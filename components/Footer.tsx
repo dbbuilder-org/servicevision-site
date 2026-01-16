@@ -1,6 +1,16 @@
 import Link from "next/link";
 
-const navigation = {
+interface NavItem {
+  name: string;
+  href: string;
+  isAI?: boolean;
+}
+
+const navigation: {
+  services: NavItem[];
+  company: NavItem[];
+  social: { name: string; href: string }[];
+} = {
   services: [
     { name: "SaaS Products", href: "/services#saas_products" },
     { name: "Enterprise AI", href: "/services#enterprise_ai" },
@@ -9,7 +19,7 @@ const navigation = {
   company: [
     { name: "About Us", href: "/about" },
     { name: "Portfolio", href: "/portfolio" },
-    { name: "Our AI Capabilities", href: "/ai" },
+    { name: "Our AI Capabilities", href: "/ai", isAI: true },
     { name: "Blog", href: "/blog" },
     { name: "Contact", href: "/contact" },
   ],
@@ -84,9 +94,13 @@ export default function Footer() {
                 <li key={item.name}>
                   <Link
                     href={item.href}
-                    className="text-sm text-gray-400 hover:text-emerald-400 transition-colors font-mono"
+                    className={`text-sm transition-colors font-mono ${
+                      item.isAI
+                        ? "text-purple-400 hover:text-purple-300"
+                        : "text-gray-400 hover:text-emerald-400"
+                    }`}
                   >
-                    <span className="text-gray-600 mr-2">&gt;</span>
+                    <span className={item.isAI ? "text-purple-600 mr-2" : "text-gray-600 mr-2"}>&gt;</span>
                     {item.name}
                   </Link>
                 </li>

@@ -727,7 +727,7 @@ export default function Home() {
               <span className="text-amber-400">root@servicevision</span>:<span className="text-emerald-400">~</span># cat capabilities.txt
             </div>
             <h2 className="text-4xl font-bold text-white mb-4">
-              AI with <span className="gradient-text-amber">Guardrails</span>
+              <span className="gradient-text-purple">AI</span> with <span className="gradient-text-amber">Guardrails</span>
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Cutting-edge AI with the compliance, security, and human oversight your stakeholders expect.
@@ -815,7 +815,7 @@ export default function Home() {
             </div>
 
             <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-              Ready for AI that{" "}
+              Ready for <span className="gradient-text-purple">AI</span> that{" "}
               <span className="gradient-text">actually works?</span>
             </h2>
 
