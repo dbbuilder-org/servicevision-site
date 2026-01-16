@@ -14,6 +14,14 @@ interface EraInfoModalProps {
 
 const rotatingWords = ["code", "projects", "solutions", "business"];
 
+const rememberPhrases: Record<string, string> = {
+  "1995": "Remember Windows 95?",
+  "1997": "Remember your first email?",
+  "2000": "Remember the dot-com era?",
+  "2005": "Remember your first PC?",
+  "2010": "Remember when the cloud was new?",
+};
+
 export default function EraInfoModal({ eraName, eraYear, showModern, onToggle, forceShow, onForceShowHandled }: EraInfoModalProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
@@ -119,7 +127,7 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle, f
                   </div>
                   <div>
                     <h2 className="text-base md:text-lg font-bold text-white">
-                      Remember {eraName.replace(/ Era$/, '')}?
+                      {rememberPhrases[eraYear] || `Remember ${eraName.replace(/ Era$/, '')}?`}
                     </h2>
                     <p className="text-[10px] text-purple-400 font-mono">{eraYear}</p>
                   </div>
