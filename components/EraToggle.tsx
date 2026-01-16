@@ -20,8 +20,8 @@ export default function EraToggle({ beforeYear, beforeLabel, defaultModern = fal
       {/* Toggle Bar */}
       <div className="fixed top-16 left-0 right-0 z-30 bg-gradient-to-r from-purple-900/95 via-indigo-900/95 to-purple-900/95 backdrop-blur-sm border-b border-purple-500/30">
         <div className="max-w-7xl mx-auto px-4 py-2">
-          <div className="flex items-center justify-between gap-4">
-            {/* Left: Era description */}
+          <div className="flex items-center justify-center md:justify-between gap-4">
+            {/* Left: Era description - hidden on mobile */}
             <div className="flex-1 hidden md:block">
               <p className="text-xs text-purple-300/70 leading-snug max-w-sm">
                 {showModern
@@ -31,32 +31,32 @@ export default function EraToggle({ beforeYear, beforeLabel, defaultModern = fal
             </div>
 
             {/* Center: Toggle */}
-            <div className="flex items-center gap-3">
-              <span className={`text-sm font-mono transition-colors whitespace-nowrap ${!showModern ? "text-white" : "text-gray-500"}`}>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className={`text-xs sm:text-sm font-mono transition-colors whitespace-nowrap ${!showModern ? "text-white" : "text-gray-500"}`}>
                 {beforeYear}
               </span>
 
               {/* Toggle Switch */}
               <button
                 onClick={() => setShowModern(!showModern)}
-                className="relative w-14 h-7 rounded-full bg-gray-800 border border-purple-500/50 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                className="relative w-12 sm:w-14 h-6 sm:h-7 rounded-full bg-gray-800 border border-purple-500/50 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                 aria-label={showModern ? "Show retro version" : "Show modern version"}
               >
                 <div
-                  className={`absolute top-0.5 w-6 h-6 rounded-full transition-all duration-300 ${
+                  className={`absolute top-0.5 w-5 sm:w-6 h-5 sm:h-6 rounded-full transition-all duration-300 ${
                     showModern
-                      ? "left-7 bg-gradient-to-r from-emerald-400 to-emerald-500"
+                      ? "left-6 sm:left-7 bg-gradient-to-r from-emerald-400 to-emerald-500"
                       : "left-0.5 bg-gradient-to-r from-amber-400 to-orange-500"
                   }`}
                 />
               </button>
 
-              <span className={`text-sm font-mono transition-colors whitespace-nowrap ${showModern ? "text-white" : "text-gray-500"}`}>
+              <span className={`text-xs sm:text-sm font-mono transition-colors whitespace-nowrap ${showModern ? "text-white" : "text-gray-500"}`}>
                 2026
               </span>
             </div>
 
-            {/* Right: AI message */}
+            {/* Right: AI message - hidden on mobile */}
             <div className="flex-1 hidden md:block text-right">
               <p className="text-xs text-purple-300/70 leading-snug max-w-sm ml-auto">
                 {showModern
