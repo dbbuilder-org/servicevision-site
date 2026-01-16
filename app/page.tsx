@@ -146,8 +146,10 @@ export default function Home() {
                 <span className="text-gray-500"> --help</span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
-                We have the answers.
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
+                <span className="text-white">You have questions.</span>
+                <br />
+                <span className="text-white">We have the answers.</span>
               </h1>
               <p className="text-xl text-gray-400 max-w-2xl leading-relaxed">
                 AI-powered development with engineers who actually pick up the phone.
