@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 
 interface EraInfoModalProps {
@@ -10,9 +10,14 @@ interface EraInfoModalProps {
   onToggle: () => void;
 }
 
+const rotatingWords = ["code", "projects", "solutions", "business"];
+
 export default function EraInfoModal({ eraName, eraYear, showModern, onToggle }: EraInfoModalProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [isRotating, setIsRotating] = useState(true);
+  const rotationCount = useRef(0);
 
   useEffect(() => {
     // Check if user has already seen the modal this session
@@ -29,6 +34,27 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle }:
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Rotate through words and land on "business"
+  useEffect(() => {
+    if (!isVisible || !isRotating) return;
+
+    const interval = setInterval(() => {
+      setCurrentWordIndex((prev) => {
+        const nextIndex = (prev + 1) % rotatingWords.length;
+        rotationCount.current += 1;
+
+        // After 2 full rotations, stop on "business" (index 3)
+        if (rotationCount.current >= 8 && nextIndex === 3) {
+          setIsRotating(false);
+        }
+
+        return nextIndex;
+      });
+    }, 400);
+
+    return () => clearInterval(interval);
+  }, [isVisible, isRotating]);
 
   const handleDismiss = () => {
     setIsVisible(false);
@@ -117,7 +143,10 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle }:
                   <span className="text-emerald-400 ml-1">Enterprise-ready from day one.</span>
                 </p>
                 <p className="text-white font-semibold text-base md:text-lg mt-2">
-                  Imagine what 12 hours could do to revolutionize your projects and your business.
+                  Imagine what 12 hours could do to revolutionize your{" "}
+                  <span className={`inline-block min-w-[90px] text-purple-400 transition-all duration-200 ${isRotating ? "opacity-90" : "opacity-100"}`}>
+                    {rotatingWords[currentWordIndex]}
+                  </span>.
                 </p>
               </div>
 
