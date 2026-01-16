@@ -138,9 +138,7 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle }:
               {/* Center: Main Copy */}
               <div className="flex-1 min-w-0">
                 <p className="text-gray-300 text-sm md:text-base leading-relaxed">
-                  <span className="text-purple-400 font-semibold">This site?</span> Interface, games, backend—all of it.
-                  Built in <span className="text-white font-bold">under 12 hours</span>. One senior engineer × AI agents trained on our best practices.
-                  <span className="text-emerald-400 ml-1">Enterprise-ready from day one.</span>
+                  We built this site—interface, games, backend—in <span className="text-white font-bold">under 12 hours</span> with one senior engineer and our AI agents trained on our best practices.
                 </p>
                 <p className="text-white font-semibold text-base md:text-lg mt-2">
                   Imagine what 12 hours could do to revolutionize your{" "}
