@@ -1,45 +1,42 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Primary: Deep Navy - trust, authority, expertise */
-  --color-primary: #1e3a5f;
-  --color-primary-dark: #152a45;
-  --color-primary-light: #e8eef4;
+  /* Terminal Theme: Dark with phosphor green accents */
+  --color-primary: #10b981;
+  --color-primary-dark: #059669;
+  --color-primary-light: #d1fae5;
 
-  /* Secondary: Teal - innovation, intelligence, tech-forward */
-  --color-secondary: #0891b2;
-  --color-secondary-dark: #0e7490;
-  --color-secondary-light: #cffafe;
+  /* Secondary: Amber for warnings/highlights */
+  --color-secondary: #f59e0b;
+  --color-secondary-dark: #d97706;
+  --color-secondary-light: #fef3c7;
 
-  /* Accent: Warm Amber - prestige, warmth, action */
-  --color-accent: #d97706;
-  --color-accent-light: #fef3c7;
+  /* Terminal colors */
+  --color-terminal-bg: #0a0a0a;
+  --color-terminal-surface: #111111;
+  --color-terminal-border: #2a2a2a;
+  --color-terminal-text: #e5e5e5;
+  --color-terminal-muted: #6b7280;
+  --color-terminal-green: #10b981;
+  --color-terminal-amber: #f59e0b;
+  --color-terminal-cyan: #06b6d4;
 
-  /* Neutrals: Slate tones - professional, modern */
-  --color-background: #fafbfc;
-  --color-foreground: #334155;
-  --color-muted: #64748b;
-  --color-subtle: #f1f5f9;
+  /* Neutrals: Dark terminal */
+  --color-background: #0a0a0a;
+  --color-foreground: #e5e5e5;
+  --color-muted: #6b7280;
+  --color-subtle: #1a1a1a;
 
   --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "SF Mono", Menlo, monospace;
 
   /* Custom animations */
   --animate-fade-in: fade-in 0.6s ease-out forwards;
   --animate-slide-up: slide-up 0.6s ease-out forwards;
-  --animate-slide-in-left: slide-in-left 0.6s ease-out forwards;
-  --animate-slide-in-right: slide-in-right 0.6s ease-out forwards;
-  --animate-scale-in: scale-in 0.5s ease-out forwards;
-  --animate-glow: glow 2s ease-in-out infinite alternate;
-  --animate-float: float 6s ease-in-out infinite;
-  --animate-shimmer: shimmer 2s linear infinite;
-}
-
-@media (prefers-color-scheme: dark) {
-  @theme inline {
-    --color-background: #0f172a;
-    --color-foreground: #e2e8f0;
-    --color-subtle: #1e293b;
-  }
+  --animate-blink: blink 1s step-end infinite;
+  --animate-flicker: flicker 0.15s infinite;
+  --animate-glow: terminal-glow 2s ease-in-out infinite alternate;
+  --animate-scan: scan 8s linear infinite;
 }
 
 body {
@@ -48,9 +45,9 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Smooth scrolling */
+/* IMPORTANT: Remove smooth scrolling to prevent auto-scroll issues */
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 /* Focus styles */
@@ -66,53 +63,48 @@ html {
 }
 
 @keyframes slide-up {
-  from { opacity: 0; transform: translateY(30px); }
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes slide-in-left {
-  from { opacity: 0; transform: translateX(-30px); }
-  to { opacity: 1; transform: translateX(0); }
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
-@keyframes slide-in-right {
-  from { opacity: 0; transform: translateX(30px); }
-  to { opacity: 1; transform: translateX(0); }
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.95; }
 }
 
-@keyframes scale-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+@keyframes terminal-glow {
+  from {
+    box-shadow: 0 0 5px rgba(16, 185, 129, 0.3),
+                0 0 10px rgba(16, 185, 129, 0.2),
+                inset 0 0 5px rgba(16, 185, 129, 0.1);
+  }
+  to {
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5),
+                0 0 20px rgba(16, 185, 129, 0.3),
+                inset 0 0 10px rgba(16, 185, 129, 0.15);
+  }
 }
 
-@keyframes glow {
-  from { box-shadow: 0 0 20px rgba(8, 145, 178, 0.3); }
-  to { box-shadow: 0 0 40px rgba(8, 145, 178, 0.6); }
+@keyframes scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+@keyframes pulse-soft {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.6; }
 }
 
 /* Animation utility classes */
 .animate-fade-in { animation: fade-in 0.6s ease-out forwards; }
 .animate-slide-up { animation: slide-up 0.6s ease-out forwards; }
-.animate-slide-in-left { animation: slide-in-left 0.6s ease-out forwards; }
-.animate-slide-in-right { animation: slide-in-right 0.6s ease-out forwards; }
-.animate-scale-in { animation: scale-in 0.5s ease-out forwards; }
-.animate-glow { animation: glow 2s ease-in-out infinite alternate; }
-.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-blink { animation: blink 1s step-end infinite; }
+.animate-terminal-glow { animation: terminal-glow 2s ease-in-out infinite alternate; }
 
 /* Staggered animation delays */
 .delay-100 { animation-delay: 100ms; }
@@ -121,133 +113,230 @@ html {
 .delay-400 { animation-delay: 400ms; }
 .delay-500 { animation-delay: 500ms; }
 
-/* Gradient text */
+/* Terminal gradient text */
 .gradient-text {
-  background: linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #22d3ee 100%);
+  background: linear-gradient(135deg, #10b981 0%, #34d399 50%, #6ee7b7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.gradient-text-warm {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+.gradient-text-amber {
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #fcd34d 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Animated gradient background */
-.animated-gradient {
-  background: linear-gradient(-45deg, #1e3a5f, #0891b2, #1e3a5f, #0e7490);
-  background-size: 400% 400%;
-  animation: gradient-shift 15s ease infinite;
-}
-
-/* Glassmorphism */
-.glass {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.glass-dark {
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Shimmer effect for loading/highlights */
-.shimmer {
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
-  background-size: 200% 100%;
-  animation: shimmer 2s linear infinite;
-}
-
-/* Subtle grid pattern background */
-.bg-grid {
-  background-image:
-    linear-gradient(rgba(30, 58, 95, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(30, 58, 95, 0.03) 1px, transparent 1px);
-  background-size: 50px 50px;
-}
-
-/* Dot pattern background */
-.bg-dots {
-  background-image: radial-gradient(rgba(30, 58, 95, 0.1) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-/* Glow button effect */
-.btn-glow {
-  position: relative;
+/* Terminal window styling */
+.terminal-window {
+  background: #111111;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
   overflow: hidden;
 }
 
-.btn-glow::before {
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #1a1a1a;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.terminal-dot-red { background: #ef4444; }
+.terminal-dot-yellow { background: #f59e0b; }
+.terminal-dot-green { background: #10b981; }
+
+.terminal-body {
+  padding: 20px;
+  font-family: var(--font-mono);
+}
+
+/* Scan lines effect */
+.scan-lines {
+  position: relative;
+}
+
+.scan-lines::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  transition: left 0.5s;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.15) 2px,
+    rgba(0, 0, 0, 0.15) 4px
+  );
+  pointer-events: none;
+  z-index: 10;
 }
 
-.btn-glow:hover::before {
-  left: 100%;
+/* CRT screen effect */
+.crt-effect {
+  position: relative;
 }
 
-/* Card hover lift effect */
+.crt-effect::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    rgba(0, 0, 0, 0.2) 90%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  pointer-events: none;
+}
+
+/* Phosphor glow text */
+.phosphor-text {
+  color: #10b981;
+  text-shadow:
+    0 0 5px rgba(16, 185, 129, 0.5),
+    0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.phosphor-text-amber {
+  color: #f59e0b;
+  text-shadow:
+    0 0 5px rgba(245, 158, 11, 0.5),
+    0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+/* Terminal card */
+.terminal-card {
+  background: #111111;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.terminal-card:hover {
+  border-color: #10b981;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+}
+
+/* Grid background for terminal aesthetic */
+.bg-terminal-grid {
+  background-image:
+    linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Dot matrix background */
+.bg-dot-matrix {
+  background-image: radial-gradient(rgba(16, 185, 129, 0.15) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* ASCII-style border */
+.ascii-border {
+  border: 1px dashed #2a2a2a;
+}
+
+/* Blinking cursor */
+.cursor-blink {
+  display: inline-block;
+  width: 10px;
+  height: 1.2em;
+  background: #10b981;
+  margin-left: 2px;
+  animation: blink 1s step-end infinite;
+}
+
+/* Command prompt styling */
+.command-prompt::before {
+  content: '>';
+  color: #10b981;
+  margin-right: 8px;
+  font-weight: bold;
+}
+
+/* Status indicator */
+.status-online {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-online::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* Retro button */
+.btn-retro {
+  background: transparent;
+  border: 2px solid #10b981;
+  color: #10b981;
+  padding: 12px 24px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+}
+
+.btn-retro:hover {
+  background: #10b981;
+  color: #0a0a0a;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-retro-amber {
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+.btn-retro-amber:hover {
+  background: #f59e0b;
+  color: #0a0a0a;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+}
+
+/* Card hover effect */
 .card-hover {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card-hover:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: translateY(-4px);
 }
 
-/* Image zoom on hover */
-.img-zoom {
-  overflow: hidden;
+/* Section divider */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #2a2a2a 20%,
+    #2a2a2a 80%,
+    transparent
+  );
 }
 
-.img-zoom img {
-  transition: transform 0.5s ease;
+/* Monospace text */
+.font-mono {
+  font-family: var(--font-mono);
 }
 
-.img-zoom:hover img {
-  transform: scale(1.1);
-}
-
-/* Section reveal animation - for scroll-triggered animations */
-.reveal {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Soft shadow for depth */
-.shadow-soft {
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.05),
-    0 10px 15px -3px rgba(0, 0, 0, 0.08),
-    0 20px 25px -5px rgba(0, 0, 0, 0.05);
-}
-
-/* Colored shadows */
-.shadow-primary {
-  box-shadow: 0 20px 40px -10px rgba(30, 58, 95, 0.3);
-}
-
-.shadow-secondary {
-  box-shadow: 0 20px 40px -10px rgba(8, 145, 178, 0.3);
+/* Text glow on hover */
+.hover-glow:hover {
+  text-shadow: 0 0 10px currentColor;
 }
