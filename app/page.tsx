@@ -127,7 +127,6 @@ export default function Home() {
               </div>
 
               <div className="terminal-body">
-                <div className="text-gray-500 text-sm mb-4 font-mono">C:\projects&gt; thinking...</div>
                 <div className="flex items-start gap-2">
                   <span className="phosphor-text text-2xl sm:text-3xl lg:text-4xl font-bold font-mono">&gt;</span>
                   <span className="phosphor-text text-2xl sm:text-3xl lg:text-4xl font-bold font-mono whitespace-nowrap">
