@@ -6,9 +6,11 @@ import Link from "next/link";
 interface EraInfoModalProps {
   eraName: string;
   eraYear: string;
+  showModern: boolean;
+  onToggle: () => void;
 }
 
-export default function EraInfoModal({ eraName, eraYear }: EraInfoModalProps) {
+export default function EraInfoModal({ eraName, eraYear, showModern, onToggle }: EraInfoModalProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
 
@@ -56,15 +58,15 @@ export default function EraInfoModal({ eraName, eraYear }: EraInfoModalProps) {
             : "opacity-0 translate-y-8 pointer-events-none"
         } bottom-4 left-4 right-4 md:bottom-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-lg`}
       >
-        <div className="bg-gradient-to-br from-[#111] via-[#151515] to-[#111] border border-purple-500/30 rounded-2xl shadow-2xl shadow-purple-500/10 overflow-hidden">
+        <div className="bg-gradient-to-br from-[#0d0d0d] via-[#111] to-[#0d0d0d] border border-purple-500/30 rounded-2xl shadow-2xl shadow-purple-500/10 overflow-hidden">
           {/* Purple accent bar */}
-          <div className="h-1 bg-gradient-to-r from-purple-500 via-purple-400 to-purple-500" />
+          <div className="h-1 bg-gradient-to-r from-purple-600 via-purple-400 to-purple-600" />
 
           <div className="p-6 md:p-8">
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-600/20 border border-purple-500/20 flex items-center justify-center">
                   <span className="text-xl">⚡</span>
                 </div>
                 <div>
@@ -85,12 +87,40 @@ export default function EraInfoModal({ eraName, eraYear }: EraInfoModalProps) {
               </button>
             </div>
 
-            {/* Body */}
-            <div className="space-y-4 text-sm md:text-base">
-              <p className="text-gray-300 leading-relaxed">
+            {/* Toggle Section */}
+            <div className="bg-gradient-to-r from-purple-900/30 via-purple-800/20 to-purple-900/30 border border-purple-500/20 rounded-xl p-4 mb-4">
+              <p className="text-gray-300 text-sm mb-3 text-center">
                 <span className="text-white font-medium">Toggle back and forth</span>—see decades of progress in one click.
               </p>
 
+              {/* Inline Toggle */}
+              <div className="flex items-center justify-center gap-3">
+                <span className={`text-sm font-mono transition-colors ${!showModern ? "text-white font-semibold" : "text-gray-500"}`}>
+                  {eraYear}
+                </span>
+
+                <button
+                  onClick={onToggle}
+                  className="relative w-16 h-8 rounded-full bg-[#1a1a1a] border border-purple-500/50 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500/50 hover:border-purple-400/70"
+                  aria-label={showModern ? "Show retro version" : "Show modern version"}
+                >
+                  <div
+                    className={`absolute top-1 w-6 h-6 rounded-full transition-all duration-300 shadow-lg ${
+                      showModern
+                        ? "left-9 bg-gradient-to-r from-emerald-400 to-emerald-500 shadow-emerald-500/30"
+                        : "left-1 bg-gradient-to-r from-amber-400 to-orange-500 shadow-amber-500/30"
+                    }`}
+                  />
+                </button>
+
+                <span className={`text-sm font-mono transition-colors ${showModern ? "text-white font-semibold" : "text-gray-500"}`}>
+                  2026
+                </span>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="space-y-4 text-sm md:text-base">
               <div className="bg-white/5 border border-white/10 rounded-xl p-4">
                 <p className="text-gray-300 leading-relaxed">
                   <span className="text-purple-400 font-semibold">This site?</span> Interface, games, backend—all of it.
@@ -105,7 +135,7 @@ export default function EraInfoModal({ eraName, eraYear }: EraInfoModalProps) {
               </p>
 
               <p className="text-white font-semibold text-base md:text-lg">
-                Imagine what 12 hours could do for your business.
+                Imagine what 12 hours could do to revolutionize your projects and your business.
               </p>
             </div>
 
@@ -113,23 +143,18 @@ export default function EraInfoModal({ eraName, eraYear }: EraInfoModalProps) {
             <div className="flex flex-col sm:flex-row gap-3 mt-6">
               <Link
                 href="/contact"
-                className="flex-1 bg-purple-600 hover:bg-purple-500 text-white font-medium px-6 py-3 rounded-lg text-center transition-colors"
+                className="flex-1 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-medium px-6 py-3 rounded-xl text-center transition-all shadow-lg shadow-purple-500/20"
                 onClick={handleDismiss}
               >
                 Start a Conversation
               </Link>
               <button
                 onClick={handleDismiss}
-                className="flex-1 bg-white/5 hover:bg-white/10 text-gray-300 font-medium px-6 py-3 rounded-lg text-center transition-colors border border-white/10"
+                className="flex-1 bg-white/5 hover:bg-white/10 text-gray-300 font-medium px-6 py-3 rounded-xl text-center transition-colors border border-white/10"
               >
-                Try the Toggle First
+                Explore the Site
               </button>
             </div>
-
-            {/* Subtle footer */}
-            <p className="text-center text-xs text-gray-600 mt-4">
-              Use the toggle above to switch between eras
-            </p>
           </div>
         </div>
       </div>
