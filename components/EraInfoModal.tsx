@@ -158,6 +158,9 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle, f
 
               {/* Center 1/3: Copy */}
               <div className="flex flex-col justify-center">
+                <p className="text-gray-300 text-sm leading-relaxed mb-3">
+                  We do too. All that progress since then? <span className="text-purple-400">ServiceVision AI</span> delivers that level of transformation—fast. Here's the proof:
+                </p>
                 <p className="text-emerald-400 text-sm leading-relaxed">
                   We built this site—interface, games, backend—in <span className="text-white font-bold">under 12 hours</span> with one senior engineer and our AI agents trained on our best practices.
                 </p>
