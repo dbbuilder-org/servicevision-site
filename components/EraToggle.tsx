@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import EraInfoModal from "./EraInfoModal";
 
 interface EraToggleProps {
   beforeYear: string;
@@ -17,6 +18,9 @@ export default function EraToggle({ beforeYear, beforeLabel, defaultModern = fal
 
   return (
     <div className="min-h-screen">
+      {/* Era Info Modal */}
+      <EraInfoModal eraYear={beforeYear} eraName={beforeLabel} />
+
       {/* Toggle Bar */}
       <div className="fixed top-16 left-0 right-0 z-30 bg-gradient-to-r from-purple-900/95 via-indigo-900/95 to-purple-900/95 backdrop-blur-sm border-b border-purple-500/30">
         <div className="max-w-7xl mx-auto px-4 py-2">
