@@ -66,7 +66,7 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle, f
 
         return nextIndex;
       });
-    }, 400);
+    }, 700);
 
     return () => clearInterval(interval);
   }, [isVisible, isRotating]);
@@ -95,8 +95,8 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle, f
       <div
         className={`fixed z-50 transition-all duration-500 ease-out left-4 right-4 md:left-8 md:right-8 lg:left-16 lg:right-16 xl:left-24 xl:right-24 ${
           isVisible
-            ? "opacity-100 translate-y-0 bottom-[15%] md:bottom-[20%]"
-            : "opacity-0 translate-y-12 bottom-[10%] pointer-events-none"
+            ? "opacity-100 translate-y-0 bottom-[8%] md:bottom-[10%]"
+            : "opacity-0 translate-y-12 bottom-[4%] pointer-events-none"
         }`}
       >
         {/* Glow effect behind modal */}
@@ -107,9 +107,9 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle, f
           {/* Purple accent bar */}
           <div className="h-1 bg-gradient-to-r from-purple-600 via-purple-400 to-purple-600" />
 
-          <div className="p-5 md:p-6">
+          <div className="p-6 md:p-8">
             {/* 1/3 - 1/3 - 1/3 Grid Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
 
               {/* Left 1/3: Header + Toggle */}
               <div className="flex flex-col justify-center items-center lg:items-start">
