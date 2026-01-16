@@ -145,8 +145,7 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle }:
                 <p className="text-white font-semibold text-base md:text-lg mt-2">
                   Imagine what 12 hours could do to revolutionize your{" "}
                   <span className={`inline-block min-w-[90px] text-purple-400 transition-all duration-200 ${isRotating ? "opacity-90" : "opacity-100"}`}>
-                    {rotatingWords[currentWordIndex]}
-                  </span>.
+                    {rotatingWords[currentWordIndex]}</span>.
                 </p>
               </div>
 
