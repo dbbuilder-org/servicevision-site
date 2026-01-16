@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import EraInfoModal from "./EraInfoModal";
 
 interface EraToggleProps {
@@ -15,8 +15,17 @@ interface EraToggleProps {
 
 export default function EraToggle({ beforeYear, beforeLabel, defaultModern = false, children }: EraToggleProps) {
   const [showModern, setShowModern] = useState(defaultModern);
+  const [forceShowModal, setForceShowModal] = useState(false);
 
   const handleToggle = () => setShowModern(!showModern);
+
+  const handleBarClick = () => {
+    setForceShowModal(true);
+  };
+
+  const handleForceShowHandled = useCallback(() => {
+    setForceShowModal(false);
+  }, []);
 
   return (
     <div className="min-h-screen">
@@ -26,10 +35,15 @@ export default function EraToggle({ beforeYear, beforeLabel, defaultModern = fal
         eraName={beforeLabel}
         showModern={showModern}
         onToggle={handleToggle}
+        forceShow={forceShowModal}
+        onForceShowHandled={handleForceShowHandled}
       />
 
-      {/* Toggle Bar - matching modal aesthetic */}
-      <div className="fixed top-16 left-0 right-0 z-30 bg-gradient-to-r from-[#0d0d0d] via-[#111] to-[#0d0d0d] backdrop-blur-sm border-b border-purple-500/30">
+      {/* Toggle Bar - matching modal aesthetic, clickable to show modal */}
+      <div
+        className="fixed top-16 left-0 right-0 z-30 bg-gradient-to-r from-[#0d0d0d] via-[#111] to-[#0d0d0d] backdrop-blur-sm border-b border-purple-500/30 cursor-pointer hover:border-purple-500/50 transition-colors"
+        onClick={handleBarClick}
+      >
         {/* Purple accent line */}
         <div className="h-0.5 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
 
@@ -39,7 +53,7 @@ export default function EraToggle({ beforeYear, beforeLabel, defaultModern = fal
             <div className="flex-1 hidden md:block">
               <p className="text-xs text-gray-400 leading-snug max-w-sm">
                 {showModern
-                  ? <><span className="text-purple-400 font-medium">AI accelerates</span> 40 years of design evolution—better solutions, modern best practices.</>
+                  ? <><span className="text-purple-400 font-medium">ServiceVision AI accelerates</span> 40 years of design evolution—better solutions, modern best practices.</>
                   : <><span className="text-white font-bold text-sm">Remember {beforeYear}?</span> <span className="text-gray-500">This is how we built software then.</span></>}
               </p>
             </div>
@@ -52,7 +66,7 @@ export default function EraToggle({ beforeYear, beforeLabel, defaultModern = fal
 
               {/* Toggle Switch - matching modal style */}
               <button
-                onClick={handleToggle}
+                onClick={(e) => { e.stopPropagation(); handleToggle(); }}
                 className="relative w-14 sm:w-16 h-7 sm:h-8 rounded-full bg-[#1a1a1a] border border-purple-500/50 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500/50 hover:border-purple-400/70"
                 aria-label={showModern ? "Show retro version" : "Show modern version"}
               >

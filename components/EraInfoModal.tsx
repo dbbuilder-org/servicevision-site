@@ -8,11 +8,13 @@ interface EraInfoModalProps {
   eraYear: string;
   showModern: boolean;
   onToggle: () => void;
+  forceShow?: boolean;
+  onForceShowHandled?: () => void;
 }
 
 const rotatingWords = ["code", "projects", "solutions", "business"];
 
-export default function EraInfoModal({ eraName, eraYear, showModern, onToggle }: EraInfoModalProps) {
+export default function EraInfoModal({ eraName, eraYear, showModern, onToggle, forceShow, onForceShowHandled }: EraInfoModalProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
@@ -34,6 +36,19 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle }:
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Handle force show from parent
+  useEffect(() => {
+    if (forceShow) {
+      setIsDismissed(false);
+      setIsVisible(true);
+      // Reset rotation
+      setCurrentWordIndex(0);
+      setIsRotating(true);
+      rotationCount.current = 0;
+      onForceShowHandled?.();
+    }
+  }, [forceShow, onForceShowHandled]);
 
   // Rotate through words and land on "business"
   useEffect(() => {
