@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useState, useEffect } from "react";
 
 const features = [
   {
@@ -50,94 +53,141 @@ const stats = [
   { value: "24/7", label: "Always Available" },
 ];
 
+const terminalQuestions = [
+  "Where do I even begin?",
+  "How can I finish this project?",
+  "Who can I trust to help me?",
+  "How do I make this SOC 2 compliant?",
+  "Can AI actually help my business?",
+  "Who knows best practices best?",
+  "How do I scale without breaking things?",
+  "Where do I find engineers who care?",
+];
+
 export default function Home() {
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [displayedText, setDisplayedText] = useState("");
+  const [isTyping, setIsTyping] = useState(true);
+
+  useEffect(() => {
+    const question = terminalQuestions[currentQuestion];
+
+    if (isTyping) {
+      if (displayedText.length < question.length) {
+        const timeout = setTimeout(() => {
+          setDisplayedText(question.slice(0, displayedText.length + 1));
+        }, 50 + Math.random() * 50); // Variable typing speed for realism
+        return () => clearTimeout(timeout);
+      } else {
+        // Pause at end of question
+        const timeout = setTimeout(() => {
+          setIsTyping(false);
+        }, 2000);
+        return () => clearTimeout(timeout);
+      }
+    } else {
+      // Delete text
+      if (displayedText.length > 0) {
+        const timeout = setTimeout(() => {
+          setDisplayedText(displayedText.slice(0, -1));
+        }, 30);
+        return () => clearTimeout(timeout);
+      } else {
+        // Move to next question
+        setCurrentQuestion((prev) => (prev + 1) % terminalQuestions.length);
+        setIsTyping(true);
+      }
+    }
+  }, [displayedText, isTyping, currentQuestion]);
+
   return (
     <>
-      {/* Hero Section with Video Background */}
-      <section className="relative isolate overflow-hidden min-h-screen flex items-center">
-        {/* Video Background */}
-        <div className="absolute inset-0 -z-20">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="h-full w-full object-cover scale-105"
-            poster="/media/hero-image.png"
-          >
-            <source src="/media/hero-video.mp4" type="video/mp4" />
-          </video>
-        </div>
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-gray-900/95 via-gray-900/80 to-primary/60" />
+      {/* Hero Section - Terminal Style */}
+      <section className="relative isolate overflow-hidden min-h-screen flex items-center bg-gray-950">
+        {/* Subtle scan lines effect */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{
+            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px)'
+          }}
+        />
 
-        {/* Floating decorative elements */}
-        <div className="absolute top-1/4 right-10 w-72 h-72 bg-cyan-500/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 left-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-float delay-300" />
+        {/* Subtle glow in corner */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cyan-500/5 rounded-full blur-3xl" />
 
-        <div className="mx-auto max-w-7xl px-6 py-32 lg:px-8">
-          <div className="max-w-2xl">
-            <div className="mb-8 animate-fade-in">
-              <span className="glass inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-white">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+        <div className="mx-auto max-w-7xl px-6 py-32 lg:px-8 w-full">
+          <div className="max-w-4xl">
+            {/* Terminal Window */}
+            <div className="rounded-lg border border-gray-800 bg-gray-900/80 backdrop-blur-sm shadow-2xl overflow-hidden">
+              {/* Terminal Header */}
+              <div className="flex items-center gap-2 px-4 py-3 bg-gray-800/50 border-b border-gray-700">
+                <div className="flex gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+                  <div className="w-3 h-3 rounded-full bg-green-500/80" />
+                </div>
+                <span className="ml-4 text-xs text-gray-500 font-mono">you@startup ~ </span>
+              </div>
+
+              {/* Terminal Content */}
+              <div className="p-6 sm:p-8 font-mono">
+                <div className="text-gray-500 text-sm mb-4">$ thinking about your next project...</div>
+                <div className="flex items-start gap-2">
+                  <span className="text-emerald-400 text-2xl sm:text-3xl lg:text-4xl font-bold">&gt;</span>
+                  <span className="text-emerald-400 text-2xl sm:text-3xl lg:text-4xl font-bold">
+                    {displayedText}
+                    <span className="inline-block w-3 sm:w-4 h-8 sm:h-10 bg-emerald-400 ml-1 animate-pulse" />
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Answer Section */}
+            <div className="mt-12 space-y-6">
+              <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">
+                We have the answers.
+                <span className="block text-gray-400 text-xl sm:text-2xl lg:text-3xl font-normal mt-2">
+                  AI-powered development with humans who actually pick up the phone.
                 </span>
-                AI-Powered Development
-              </span>
-            </div>
-            <h1 className="text-5xl font-bold tracking-tight text-white sm:text-7xl leading-tight animate-slide-up">
-              AI-powered.
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-400 to-blue-500 animate-pulse">
-                Human-delivered.
-              </span>
-            </h1>
-            <p className="mt-8 text-xl text-gray-300 leading-relaxed animate-slide-up delay-200">
-              We combine cutting-edge AI with the high-touch, compliance-first service
-              you can&apos;t find anywhere else. Real relationships. Real accountability.
-              Technology that actually works for your business.
-            </p>
-            <div className="mt-10 flex flex-wrap items-center gap-4 animate-slide-up delay-300">
-              <Link
-                href="/contact"
-                className="btn-glow group relative inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-cyan-500/25 transition-all hover:shadow-xl hover:shadow-cyan-500/40 hover:scale-105"
-              >
-                Start a Project
-                <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </Link>
-              <Link
-                href="/services"
-                className="glass inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-semibold text-white transition-all hover:bg-white/20"
-              >
-                Explore Services
-              </Link>
-            </div>
-          </div>
-        </div>
+              </p>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-          <div className="flex flex-col items-center gap-2 text-white/60">
-            <span className="text-xs uppercase tracking-widest">Scroll</span>
-            <svg className="h-6 w-6 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-            </svg>
+              <p className="text-lg text-gray-400 max-w-2xl leading-relaxed">
+                Compliance-first. High-touch service. Real accountability.
+                We&apos;re the technical partner you&apos;ve been looking for.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-4 pt-4">
+                <Link
+                  href="/contact"
+                  className="group inline-flex items-center gap-2 rounded-full bg-emerald-500 px-8 py-4 text-sm font-semibold text-gray-900 shadow-lg shadow-emerald-500/25 transition-all hover:bg-emerald-400 hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-105"
+                >
+                  Start a Conversation
+                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
+                <Link
+                  href="/services"
+                  className="inline-flex items-center gap-2 rounded-full border border-gray-700 px-8 py-4 text-sm font-semibold text-gray-300 transition-all hover:bg-gray-800 hover:border-gray-600 hover:text-white"
+                >
+                  Explore Services
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Stats Bar */}
-      <section className="relative -mt-16 z-10 mx-auto max-w-5xl px-6">
-        <div className="rounded-3xl bg-white/80 backdrop-blur-xl shadow-2xl shadow-gray-900/10 ring-1 ring-gray-900/5">
-          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-gray-100">
-            {stats.map((stat, index) => (
-              <div key={stat.label} className="group px-6 py-10 text-center transition-colors hover:bg-gray-50/50">
-                <p className="text-4xl font-bold tracking-tight bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent">
+      <section className="relative z-10 mx-auto max-w-5xl px-6 -mt-8">
+        <div className="rounded-2xl bg-gray-900 border border-gray-800 shadow-2xl">
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-gray-800">
+            {stats.map((stat) => (
+              <div key={stat.label} className="group px-6 py-8 text-center transition-colors hover:bg-gray-800/50">
+                <p className="text-3xl font-bold tracking-tight text-emerald-400">
                   {stat.value}
                 </p>
-                <p className="mt-2 text-sm font-medium text-gray-600">{stat.label}</p>
+                <p className="mt-2 text-sm font-medium text-gray-400">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -152,8 +202,8 @@ export default function Home() {
               Your Team
             </span>
             <p className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-              AI expertise with a{" "}
-              <span className="gradient-text">human face</span>
+              AI expertise with{" "}
+              <span className="gradient-text">real accountability</span>
             </p>
             <p className="mt-6 text-lg text-gray-600 leading-8">
               No ticket systems. No rotating contractors. Just a dedicated team that picks up when you call.
