@@ -119,7 +119,7 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle, f
                   </div>
                   <div>
                     <h2 className="text-base md:text-lg font-bold text-white">
-                      Remember the {eraName}?
+                      Remember {eraName.replace(/ Era$/, '')}?
                     </h2>
                     <p className="text-[10px] text-purple-400 font-mono">{eraYear}</p>
                   </div>
