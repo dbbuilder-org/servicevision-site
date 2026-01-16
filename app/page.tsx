@@ -1,7 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import EraBanner from "@/components/EraBanner";
+import dynamic from "next/dynamic";
+
+// Lazy load the game to avoid SSR issues
+const AsteroidsGame = dynamic(() => import("@/components/AsteroidsGame"), {
+  ssr: false,
+});
 
 const services = [
   {
@@ -43,17 +50,81 @@ const stats = [
   { label: "availability", value: "24/7", desc: "Always Available" },
 ];
 
-const terminalQuestions = [
-  "Where do I begin?",
-  "How do I finish this?",
-  "Who can I trust?",
-  "Is this SOC 2 compliant?",
-  "Can AI help my business?",
-  "Who knows best practices?",
-  "How do I scale this?",
-  "Who actually cares?",
-  "What about compliance?",
-  "Is this even possible?",
+// Questions and their answers for the terminal and answer box
+const questionsAndAnswers = [
+  {
+    q: "Where do I start?",
+    a: "With a conversation. We'll listen to your challenges, understand your constraints, and give you an honest assessment—not a sales pitch."
+  },
+  {
+    q: "How do I meet compliance?",
+    a: "We build compliance in from day one. SOC 2, HIPAA, audit trails—we've done this for regulated industries and know what your auditors will ask."
+  },
+  {
+    q: "Who will own my project?",
+    a: "A named project lead who answers their phone. Not a rotating cast of contractors. Someone who knows your codebase and your business."
+  },
+  {
+    q: "Can AI reduce my costs?",
+    a: "Yes, but we'll be honest about where. We identify high-impact automation opportunities and build ROI models you can defend to your board."
+  },
+  {
+    q: "How do I scale securely?",
+    a: "Architecture that grows with you. We design for your next stage, not just today's problems. Security reviews at every milestone."
+  },
+  {
+    q: "Who understands my industry?",
+    a: "25 years across healthcare, finance, logistics, and enterprise. We speak your domain language and know the regulations that keep you up at night."
+  },
+  {
+    q: "Will this pass an audit?",
+    a: "We've been through dozens. Audit trails, explainable AI decisions, proper access controls—built in, not bolted on."
+  },
+  {
+    q: "Who answers when I call?",
+    a: "Your dedicated team lead. Direct line. 4-hour response SLA. We're not a help desk—we're your technical partners."
+  },
+  {
+    q: "Can I trust the AI output?",
+    a: "Human-in-the-loop design for critical decisions. Confidence scores, uncertainty flags, and review workflows where they matter."
+  },
+  {
+    q: "Who treats this like theirs?",
+    a: "We do. No lock-in contracts because we earn your business monthly. Your success is our reputation."
+  },
+];
+
+const terminalQuestions = questionsAndAnswers.map(qa => qa.q);
+
+// The "senior" question to land on - this is the one we want to emphasize
+const seniorQuestion = "Who treats this like theirs?";
+
+// Dot matrix intro lines - printed bidirectionally like old printers
+const dotMatrixLines = [
+  "Your dedicated team of advisors, developers, engineers,",
+  "mentors, marketers, product managers, and consultants.",
+  "Twenty-five years of enterprise expertise meets cutting-edge AI.",
+  "Real value. No hype. Results you can audit.",
+];
+
+// WarGames response pool - tractor-fed wisdom
+const gameResponsePool = [
+  "We are all work, but we also find time to have fun. Please feel free to join in.",
+  "Our team ships code by day and high scores by night. Balance is key.",
+  "Fun fact: Our best architecture decisions came after intense Asteroids sessions.",
+  "Every great developer needs a break. Even WOPR takes time to think.",
+  "The only winning move is... to take a break and play a game.",
+  "Shall we play a game? How about Global Thermonuclear War? Just kidding. Asteroids.",
+  "Professor Falken would approve. Sometimes the best code comes after play.",
+  "25 years of shipping software. 25 years of Easter eggs. It's tradition.",
+  "AI can write code, but can it beat our Asteroids high score? Doubtful.",
+  "Work hard, play hard. That's the ServiceVision way since 2001.",
+  "Our Seattle office has a leaderboard. Just saying.",
+  "Remember: A strange game. The only winning move is to play.",
+  "Fine, don't play. But you're missing out on some quality procrastination.",
+  "We've hidden games in enterprise software since before it was cool.",
+  "Last chance. The asteroids aren't going to shoot themselves.",
+  "Okay, we respect your dedication to work. But the offer stands.",
 ];
 
 // Shuffle array helper
@@ -71,15 +142,211 @@ export default function Home() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(true);
+  const [showAsteroids, setShowAsteroids] = useState(false);
+  const [secretCode, setSecretCode] = useState("");
+  const [landedOnFinal, setLandedOnFinal] = useState(false);
 
-  // Randomize questions on mount
+  // "We have the answers" reveal state - shows after 5 seconds
+  const [showAnswers, setShowAnswers] = useState(false);
+  const answersShown = useRef(false);
+
+  // Dot matrix printer state
+  const [printedLines, setPrintedLines] = useState<string[]>([]);
+  const [currentLineIndex, setCurrentLineIndex] = useState(0);
+  const [currentCharIndex, setCurrentCharIndex] = useState(0);
+  const [isPrinting, setIsPrinting] = useState(false);
+  const printStarted = useRef(false);
+
+  // WarGames "Do you want to play a game?" state
+  const [showGamePrompt, setShowGamePrompt] = useState(false);
+  const [gamePromptMessages, setGamePromptMessages] = useState<string[]>([]);
+  const [gameResponseIndex, setGameResponseIndex] = useState(0);
+  const gamePromptShown = useRef(false);
+  const tractorFeedRef = useRef<HTMLDivElement>(null);
+
+  // Answers scroll state
+  const [hasScrolledAnswers, setHasScrolledAnswers] = useState(false);
+  const [showQASection, setShowQASection] = useState(false);
+  const [printingComplete, setPrintingComplete] = useState(false);
+  const answersBoxRef = useRef<HTMLDivElement>(null);
+
+  // Set up questions: shuffle a few, then end with the senior question
   useEffect(() => {
-    setQuestions(shuffleArray(terminalQuestions));
+    // Get random questions (excluding the senior one), take 3-4 of them
+    const otherQuestions = terminalQuestions.filter(q => q !== seniorQuestion);
+    const randomOthers = shuffleArray(otherQuestions).slice(0, 4);
+    // Add senior question at the end
+    setQuestions([...randomOthers, seniorQuestion]);
+    // Prevent auto-scroll - keep focus at top
+    window.scrollTo(0, 0);
   }, []);
+
+  // Show "We have the answers" after landing on the final question
+  useEffect(() => {
+    if (!landedOnFinal || answersShown.current) return;
+    answersShown.current = true;
+
+    const answersDelay = setTimeout(() => {
+      setShowAnswers(true);
+    }, 2000); // 2 seconds after landing on final question
+
+    return () => clearTimeout(answersDelay);
+  }, [landedOnFinal]);
+
+  // Start dot matrix printing after answers are shown
+  useEffect(() => {
+    if (!showAnswers || printStarted.current) return;
+    printStarted.current = true;
+
+    const startDelay = setTimeout(() => {
+      setIsPrinting(true);
+    }, 500);
+
+    return () => clearTimeout(startDelay);
+  }, [showAnswers]);
+
+  // Dot matrix printer effect - bidirectional like real dot matrix
+  useEffect(() => {
+    if (!isPrinting || currentLineIndex >= dotMatrixLines.length) {
+      if (currentLineIndex >= dotMatrixLines.length && !printingComplete) {
+        setIsPrinting(false);
+        setPrintingComplete(true);
+      }
+      return;
+    }
+
+    const currentLine = dotMatrixLines[currentLineIndex];
+    const isReverseDirection = currentLineIndex % 2 === 1; // Odd lines print right-to-left
+
+    if (currentCharIndex < currentLine.length) {
+      const timeout = setTimeout(() => {
+        setPrintedLines(prev => {
+          const newLines = [...prev];
+          if (isReverseDirection) {
+            // Right to left: build string from the end
+            const charsToShow = currentCharIndex + 1;
+            newLines[currentLineIndex] = currentLine.slice(currentLine.length - charsToShow);
+          } else {
+            // Left to right: build string from the start
+            newLines[currentLineIndex] = currentLine.slice(0, currentCharIndex + 1);
+          }
+          return newLines;
+        });
+        setCurrentCharIndex(prev => prev + 1);
+      }, 20 + Math.random() * 15); // Fast like dot matrix
+
+      return () => clearTimeout(timeout);
+    } else {
+      // Line complete, move to next
+      const lineDelay = setTimeout(() => {
+        setCurrentLineIndex(prev => prev + 1);
+        setCurrentCharIndex(0);
+      }, 100); // Brief pause between lines (carriage return)
+
+      return () => clearTimeout(lineDelay);
+    }
+  }, [isPrinting, currentLineIndex, currentCharIndex]);
+
+  // WarGames prompt - show 3 seconds after dot matrix printing completes
+  useEffect(() => {
+    if (!printingComplete || gamePromptShown.current) return;
+    gamePromptShown.current = true;
+
+    const promptDelay = setTimeout(() => {
+      setShowGamePrompt(true);
+    }, 3000);
+
+    return () => clearTimeout(promptDelay);
+  }, [printingComplete]);
+
+  // Handle Yes response to game prompt
+  const handleGameYes = () => {
+    setShowAsteroids(true);
+    setShowGamePrompt(false);
+    setGamePromptMessages([]);
+  };
+
+  // Handle No response to game prompt
+  const handleGameNo = () => {
+    const response = gameResponsePool[gameResponseIndex % gameResponsePool.length];
+    setGamePromptMessages(prev => [...prev, response]);
+    setGameResponseIndex(prev => prev + 1);
+
+    // Auto-scroll tractor feed to bottom after state update
+    setTimeout(() => {
+      if (tractorFeedRef.current) {
+        tractorFeedRef.current.scrollTop = tractorFeedRef.current.scrollHeight;
+      }
+    }, 50);
+  };
+
+  // Reveal Q&A section helper
+  const revealAndScrollQA = () => {
+    if (!showQASection) {
+      setShowQASection(true);
+      setHasScrolledAnswers(true);
+    } else if (answersBoxRef.current) {
+      answersBoxRef.current.scrollBy({ top: 80, behavior: 'smooth' });
+    }
+  };
+
+  // Easter egg: Type "play" anywhere OR Alt+Y/Alt+N for game prompt OR arrow keys for Q&A
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger if typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      // Down arrow or Space to reveal/scroll Q&A (when answers are shown)
+      if ((e.key === "ArrowDown" || e.key === " ") && showAnswers && printingComplete) {
+        e.preventDefault();
+        revealAndScrollQA();
+        return;
+      }
+
+      // Alt+Y to accept game prompt
+      if (e.altKey && e.key.toLowerCase() === "y" && showGamePrompt) {
+        e.preventDefault();
+        handleGameYes();
+        return;
+      }
+
+      // Alt+N to decline game prompt
+      if (e.altKey && e.key.toLowerCase() === "n" && showGamePrompt) {
+        e.preventDefault();
+        handleGameNo();
+        return;
+      }
+    };
+
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Don't trigger if typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      const newCode = (secretCode + e.key).slice(-4).toLowerCase();
+      setSecretCode(newCode);
+
+      if (newCode === "play") {
+        setShowAsteroids(true);
+        setSecretCode("");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keypress", handleKeyPress);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keypress", handleKeyPress);
+    };
+  }, [secretCode, showGamePrompt, showAnswers, printingComplete, showQASection]);
 
   useEffect(() => {
     if (questions.length === 0) return;
     const question = questions[currentQuestion];
+    const isLastQuestion = currentQuestion === questions.length - 1;
 
     if (isTyping) {
       if (displayedText.length < question.length) {
@@ -88,19 +355,28 @@ export default function Home() {
         }, 50 + Math.random() * 50);
         return () => clearTimeout(timeout);
       } else {
-        const timeout = setTimeout(() => {
-          setIsTyping(false);
-        }, 2000);
-        return () => clearTimeout(timeout);
+        // Finished typing current question
+        if (isLastQuestion) {
+          // On the senior question - stay here, mark as landed
+          setLandedOnFinal(true);
+        } else {
+          // Not the last question - pause then erase
+          const timeout = setTimeout(() => {
+            setIsTyping(false);
+          }, 1500);
+          return () => clearTimeout(timeout);
+        }
       }
     } else {
+      // Erasing mode
       if (displayedText.length > 0) {
         const timeout = setTimeout(() => {
           setDisplayedText(displayedText.slice(0, -1));
         }, 30);
         return () => clearTimeout(timeout);
       } else {
-        setCurrentQuestion((prev) => (prev + 1) % questions.length);
+        // Done erasing - move to next question
+        setCurrentQuestion((prev) => prev + 1);
         setIsTyping(true);
       }
     }
@@ -108,6 +384,11 @@ export default function Home() {
 
   return (
     <div className="bg-[#0a0a0a] min-h-screen">
+      {/* Easter Egg: Asteroids Game - Type "play" to activate */}
+      {showAsteroids && (
+        <AsteroidsGame onClose={() => setShowAsteroids(false)} />
+      )}
+
       {/* Hero Section - Terminal Style */}
       <section className="relative min-h-screen flex items-center">
         {/* Subtle grid background */}
@@ -119,8 +400,13 @@ export default function Home() {
 
         <div className="relative mx-auto max-w-7xl px-6 py-32 lg:px-8 w-full">
           <div className="max-w-4xl">
-            {/* Terminal Window */}
-            <div className="terminal-window animate-terminal-glow">
+            {/* Part 1: "You have the questions..." */}
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-8">
+              You have the questions...
+            </h1>
+
+            {/* Terminal Window - Shows rotating questions */}
+            <div className="terminal-window animate-terminal-glow mb-8">
               <div className="terminal-header">
                 <span className="text-xs text-emerald-400 font-mono">SERVICEVISION</span>
                 <span className="text-xs text-gray-600 font-mono ml-auto">v1.0</span>
@@ -137,27 +423,193 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Answer Section */}
-            <div className="mt-12 space-y-6">
-              <div className="font-mono">
+            {/* Part 2: "We have the answers." - revealed after landing on final question */}
+            {showAnswers && (
+              <>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-8 animate-fade-in">
+                  We have the answers.
+                </h2>
+
+                {/* Answer Box with Dot Matrix Intro + Scrollable Q&A */}
+                <div className="bg-[#111] border border-[#333] rounded-lg p-6 mb-10 font-mono">
+                  {/* Dot Matrix Intro - printed bidirectionally, only show lines that have content */}
+                  <div className="space-y-1">
+                    {dotMatrixLines.map((line, index) => {
+                      const isReverse = index % 2 === 1;
+                      const displayedLine = printedLines[index] || "";
+                      const isCurrentLine = index === currentLineIndex && isPrinting;
+                      const isComplete = index < currentLineIndex || (index === currentLineIndex && currentCharIndex >= line.length);
+
+                      // Only render lines that have started printing
+                      if (!displayedLine && !isCurrentLine) return null;
+
+                      return (
+                        <div
+                          key={index}
+                          className={`text-sm leading-relaxed tracking-wide ${
+                            isReverse ? "text-right" : "text-left"
+                          }`}
+                        >
+                          <span className={`${isComplete ? "text-amber-300" : "text-amber-400"}`}>
+                            {displayedLine}
+                          </span>
+                          {isCurrentLine && (
+                            <span className="inline-block w-2 h-4 bg-amber-400 ml-0.5 animate-pulse" />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Reveal prompt - shows after printing completes, before Q&A revealed */}
+                  {printingComplete && !showQASection && (
+                    <div className="flex flex-col items-center pt-4 mt-4 border-t border-[#333]">
+                      <button
+                        onClick={revealAndScrollQA}
+                        className="flex items-center gap-3 text-amber-400 hover:text-amber-300 text-sm font-mono cursor-pointer transition-colors group"
+                      >
+                        <span className="text-lg animate-bounce">↓</span>
+                        <span className="border-b border-dashed border-amber-400/50 group-hover:border-amber-300">Read More Answers</span>
+                        <span className="text-lg animate-bounce">↓</span>
+                      </button>
+                      <span className="text-gray-600 text-xs mt-2">Press ↓ or Space</span>
+                    </div>
+                  )}
+
+                  {/* Scrollable Q&A content - only rendered when revealed */}
+                  {showQASection && (
+                    <div
+                      ref={answersBoxRef}
+                      className="max-h-[160px] overflow-y-auto pr-2 scroll-smooth pt-4 mt-4 border-t border-[#333] relative"
+                      onScroll={(e) => {
+                        if (!hasScrolledAnswers && e.currentTarget.scrollTop > 20) {
+                          setHasScrolledAnswers(true);
+                        }
+                      }}
+                      style={{
+                        backgroundImage: `repeating-linear-gradient(
+                          transparent,
+                          transparent 31px,
+                          rgba(251, 191, 36, 0.03) 31px,
+                          rgba(251, 191, 36, 0.03) 32px
+                        )`,
+                        backgroundSize: '100% 32px',
+                      }}
+                    >
+                      <div className="space-y-4">
+                        {questionsAndAnswers.map((qa, index) => (
+                          <div key={index} className="group">
+                            <div className="flex items-start gap-2 mb-1">
+                              <span className="text-gray-600 text-xs shrink-0">[{String(index + 1).padStart(2, '0')}]</span>
+                              <span className="text-amber-400 text-sm font-semibold">{qa.q}</span>
+                            </div>
+                            <div className="pl-8 text-amber-300/80 text-sm leading-relaxed">
+                              {qa.a}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Scroll indicator - fades after scrolling */}
+                      <div
+                        className={`sticky bottom-0 left-0 right-0 flex flex-col items-center pt-2 transition-opacity duration-500 ${
+                          hasScrolledAnswers ? "opacity-0 pointer-events-none" : "opacity-100"
+                        }`}
+                      >
+                        <div className="bg-gradient-to-t from-[#111] via-[#111]/90 to-transparent h-8 w-full absolute bottom-0 pointer-events-none" />
+                        <span className="relative text-amber-400/60 text-xs animate-bounce">↓ scroll ↓</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* WarGames "Do you want to play a game?" prompt */}
+                {showGamePrompt && (
+                  <div className="bg-[#111] border border-[#333] rounded-lg p-6 font-mono">
+                    {/* Tractor feed paper - scrollable message history */}
+                    {gamePromptMessages.length > 0 && (
+                      <div
+                        ref={tractorFeedRef}
+                        className="max-h-32 overflow-y-auto mb-4 scroll-smooth"
+                        style={{
+                          backgroundImage: `repeating-linear-gradient(
+                            transparent,
+                            transparent 23px,
+                            rgba(251, 191, 36, 0.05) 23px,
+                            rgba(251, 191, 36, 0.05) 24px
+                          )`,
+                          backgroundSize: '100% 24px',
+                        }}
+                      >
+                        {/* Tractor feed holes decoration */}
+                        <div className="relative">
+                          <div className="absolute left-0 top-0 bottom-0 w-4 flex flex-col justify-start gap-[18px] pt-1 opacity-30">
+                            {gamePromptMessages.map((_, idx) => (
+                              <div key={idx} className="w-2 h-2 rounded-full border border-amber-600" />
+                            ))}
+                          </div>
+                          <div className="absolute right-0 top-0 bottom-0 w-4 flex flex-col justify-start gap-[18px] pt-1 opacity-30">
+                            {gamePromptMessages.map((_, idx) => (
+                              <div key={idx} className="w-2 h-2 rounded-full border border-amber-600" />
+                            ))}
+                          </div>
+
+                          {/* Messages */}
+                          <div className="px-6 py-2 space-y-2">
+                            {gamePromptMessages.map((msg, idx) => (
+                              <div key={idx} className="text-amber-400/90 text-sm leading-6">
+                                <span className="text-gray-600 text-xs mr-2">[{String(idx + 1).padStart(2, '0')}]</span>
+                                {msg}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* The question */}
+                    <div className="text-amber-400 text-sm sm:text-base mb-3">
+                      <span className="text-gray-500">WOPR&gt; </span>
+                      Do you want to play a game?
+                      {gamePromptMessages.length > 0 && (
+                        <span className="text-gray-600 text-xs ml-2">
+                          (attempt #{gamePromptMessages.length + 1})
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Yes/No options */}
+                    <div className="flex items-center gap-6 text-sm sm:text-base">
+                      <button
+                        onClick={handleGameYes}
+                        className="text-amber-400 hover:text-amber-300 hover:bg-amber-400/10 px-3 py-1 rounded transition-colors group"
+                      >
+                        [<span className="underline group-hover:font-bold">Y</span>]es
+                      </button>
+                      <button
+                        onClick={handleGameNo}
+                        className="text-amber-400 hover:text-amber-300 hover:bg-amber-400/10 px-3 py-1 rounded transition-colors group"
+                      >
+                        [<span className="underline group-hover:font-bold">N</span>]o
+                      </button>
+                      <span className="text-gray-600 text-xs ml-auto hidden sm:inline">
+                        Alt+Y / Alt+N
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* CTA Section */}
+            <div>
+              <div className="font-mono mb-6">
                 <span className="text-gray-500">$ </span>
                 <span className="text-emerald-400">servicevision</span>
-                <span className="text-gray-500"> --help</span>
+                <span className="text-gray-500"> --start</span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
-                <span className="text-white">You have questions.</span>
-                <br />
-                <span className="text-white">We have the answers.</span>
-              </h1>
-              <p className="text-xl text-gray-400 max-w-2xl leading-relaxed">
-                AI-powered development with engineers who actually pick up the phone.
-                <span className="block mt-2 text-emerald-400 font-mono text-lg">
-                  Compliance-first. High-touch service. Real accountability.
-                </span>
-              </p>
-
-              <div className="flex flex-wrap items-center gap-4 pt-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <Link
                   href="/contact"
                   className="btn-retro rounded-lg"
@@ -190,6 +642,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Era Banner - Experience Through the Ages */}
+      <EraBanner />
 
       {/* Services Section */}
       <section className="relative py-24">

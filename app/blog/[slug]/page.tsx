@@ -72,7 +72,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       <section className="bg-gray-50 py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-3xl">
-            <article className="prose prose-lg prose-gray max-w-none prose-headings:font-semibold prose-headings:text-gray-900 prose-a:text-primary prose-a:no-underline hover:prose-a:underline">
+            <article className="blog-content">
               <div dangerouslySetInnerHTML={{ __html: post.content }} />
             </article>
           </div>

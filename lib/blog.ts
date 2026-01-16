@@ -1,8 +1,15 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import { marked } from "marked";
 
 const postsDirectory = path.join(process.cwd(), "content/blog");
+
+// Configure marked for safe HTML output
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+});
 
 export interface BlogPost {
   slug: string;
@@ -11,6 +18,7 @@ export interface BlogPost {
   date: string;
   author: string;
   category: string;
+  readTime: string;
   content: string;
 }
 
@@ -35,7 +43,8 @@ export function getAllPosts(): BlogPost[] {
         date: data.date || new Date().toISOString(),
         author: data.author || "ServiceVision",
         category: data.category || "General",
-        content,
+        readTime: data.readTime || "5 min read",
+        content: marked(content) as string,
       };
     })
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -60,7 +69,8 @@ export function getPostBySlug(slug: string): BlogPost | null {
     date: data.date || new Date().toISOString(),
     author: data.author || "ServiceVision",
     category: data.category || "General",
-    content,
+    readTime: data.readTime || "5 min read",
+    content: marked(content) as string,
   };
 }
 

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gem Cascade - ServiceVision Arcade</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: linear-gradient(180deg, #1a0533 0%, #2d1b4e 50%, #1a0533 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .game-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .stat-box {
+            background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 15px;
+            padding: 10px 25px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(180deg, #fff 0%, #a0a0ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .game-container {
+            background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.6) 100%);
+            border: 3px solid rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow:
+                0 0 40px rgba(138, 43, 226, 0.3),
+                inset 0 0 30px rgba(0,0,0,0.3);
+        }
+
+        canvas {
+            display: block;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .moves-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .moves-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .moves-track {
+            flex: 1;
+            height: 8px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .moves-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .overlay.active {
+            display: flex;
+        }
+
+        .overlay h1 {
+            font-size: 42px;
+            text-shadow: 0 0 30px currentColor;
+        }
+
+        .overlay.win h1 { color: #6bcb77; }
+        .overlay.lose h1 { color: #ff6b6b; }
+
+        .overlay p {
+            font-size: 20px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .btn {
+            background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 100%);
+            border: none;
+            color: #fff;
+            padding: 15px 40px;
+            font-family: inherit;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
+        }
+
+        .hint {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 10px;
+        }
+
+        /* Floating particles */
+        .particle {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 15s infinite ease-in-out;
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-wrapper">
+        <div class="header">
+            <div class="stat-box">
+                <div class="stat-label">Score</div>
+                <div class="stat-value" id="score">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Level</div>
+                <div class="stat-value" id="level">1</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Target</div>
+                <div class="stat-value" id="target">1000</div>
+            </div>
+        </div>
+
+        <div class="game-container">
+            <canvas id="gameCanvas" width="480" height="480"></canvas>
+            <div class="moves-bar">
+                <span class="moves-label">Moves: <span id="moves">30</span></span>
+                <div class="moves-track">
+                    <div class="moves-fill" id="movesFill" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hint">Click gems to swap with neighbors and match 3+ of the same color</div>
+    </div>
+
+    <div class="overlay" id="winOverlay">
+        <h1>LEVEL COMPLETE!</h1>
+        <p>Score: <span id="winScore">0</span></p>
+        <button class="btn" onclick="nextLevel()">Next Level</button>
+    </div>
+
+    <div class="overlay lose" id="loseOverlay">
+        <h1>OUT OF MOVES!</h1>
+        <p>Final Score: <span id="loseScore">0</span></p>
+        <button class="btn" onclick="restartGame()">Try Again</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const GRID_SIZE = 8;
+        const GEM_SIZE = 60;
+
+        // Gem types with gradients
+        const GEM_TYPES = [
+            { colors: ['#ff6b6b', '#ee5a5a', '#cc4444'], glow: '#ff6b6b' }, // Ruby
+            { colors: ['#4ecdc4', '#3dbdb5', '#2ca49c'], glow: '#4ecdc4' }, // Emerald
+            { colors: ['#45b7d1', '#38a3bc', '#2b8fa7'], glow: '#45b7d1' }, // Sapphire
+            { colors: ['#f9ca24', '#e8ba13', '#d4a90f'], glow: '#f9ca24' }, // Topaz
+            { colors: ['#a55eea', '#9645e0', '#7c2ed1'], glow: '#a55eea' }, // Amethyst
+            { colors: ['#fd79a8', '#fc5c91', '#fa3f7a'], glow: '#fd79a8' }, // Rose
+        ];
+
+        let grid = [];
+        let selected = null;
+        let score = 0;
+        let level = 1;
+        let moves = 30;
+        let maxMoves = 30;
+        let target = 1000;
+        let animating = false;
+        let swapping = null;
+
+        // Create floating particles
+        function createParticles() {
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.background = GEM_TYPES[Math.floor(Math.random() * GEM_TYPES.length)].glow;
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                document.body.appendChild(particle);
+            }
+        }
+
+        function createGrid() {
+            grid = [];
+            for (let row = 0; row < GRID_SIZE; row++) {
+                grid[row] = [];
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    let type;
+                    do {
+                        type = Math.floor(Math.random() * GEM_TYPES.length);
+                    } while (wouldMatch(row, col, type));
+                    grid[row][col] = { type, x: col * GEM_SIZE, y: row * GEM_SIZE, targetX: col * GEM_SIZE, targetY: row * GEM_SIZE, scale: 1, removing: false };
+                }
+            }
+        }
+
+        function wouldMatch(row, col, type) {
+            // Check horizontal
+            if (col >= 2 && grid[row][col-1]?.type === type && grid[row][col-2]?.type === type) return true;
+            // Check vertical
+            if (row >= 2 && grid[row-1]?.[col]?.type === type && grid[row-2]?.[col]?.type === type) return true;
+            return false;
+        }
+
+        function drawGem(x, y, type, scale = 1, removing = false) {
+            const gem = GEM_TYPES[type];
+            const size = GEM_SIZE * 0.85 * scale;
+            const cx = x + GEM_SIZE / 2;
+            const cy = y + GEM_SIZE / 2;
+
+            ctx.save();
+            ctx.globalAlpha = removing ? 0.5 : 1;
+
+            // Glow effect
+            const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, size);
+            gradient.addColorStop(0, gem.glow + '40');
+            gradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(cx, cy, size * 1.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Main gem (hexagon-ish shape)
+            const gemGradient = ctx.createLinearGradient(cx - size/2, cy - size/2, cx + size/2, cy + size/2);
+            gemGradient.addColorStop(0, gem.colors[0]);
+            gemGradient.addColorStop(0.5, gem.colors[1]);
+            gemGradient.addColorStop(1, gem.colors[2]);
+
+            ctx.fillStyle = gemGradient;
+            ctx.beginPath();
+            const sides = 6;
+            for (let i = 0; i < sides; i++) {
+                const angle = (i / sides) * Math.PI * 2 - Math.PI / 2;
+                const px = cx + Math.cos(angle) * size / 2;
+                const py = cy + Math.sin(angle) * size / 2;
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.closePath();
+            ctx.fill();
+
+            // Highlight
+            ctx.fillStyle = 'rgba(255,255,255,0.4)';
+            ctx.beginPath();
+            ctx.ellipse(cx - size * 0.15, cy - size * 0.15, size * 0.2, size * 0.1, -Math.PI / 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw grid background
+            for (let row = 0; row < GRID_SIZE; row++) {
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    const x = col * GEM_SIZE;
+                    const y = row * GEM_SIZE;
+                    ctx.fillStyle = (row + col) % 2 === 0 ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.1)';
+                    ctx.fillRect(x, y, GEM_SIZE, GEM_SIZE);
+                }
+            }
+
+            // Draw gems
+            for (let row = 0; row < GRID_SIZE; row++) {
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    const gem = grid[row][col];
+                    if (gem) {
+                        drawGem(gem.x, gem.y, gem.type, gem.scale, gem.removing);
+                    }
+                }
+            }
+
+            // Draw selection
+            if (selected && !animating) {
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(selected.col * GEM_SIZE + 5, selected.row * GEM_SIZE + 5, GEM_SIZE - 10, GEM_SIZE - 10);
+            }
+        }
+
+        function animate() {
+            let stillAnimating = false;
+
+            for (let row = 0; row < GRID_SIZE; row++) {
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    const gem = grid[row][col];
+                    if (gem) {
+                        // Animate X position
+                        if (gem.x !== gem.targetX) {
+                            gem.x += (gem.targetX - gem.x) * 0.25;
+                            if (Math.abs(gem.x - gem.targetX) < 0.5) gem.x = gem.targetX;
+                            else stillAnimating = true;
+                        }
+
+                        // Animate Y position (falling)
+                        if (gem.y !== gem.targetY) {
+                            gem.y += (gem.targetY - gem.y) * 0.2;
+                            if (Math.abs(gem.y - gem.targetY) < 0.5) gem.y = gem.targetY;
+                            else stillAnimating = true;
+                        }
+
+                        // Animate removal
+                        if (gem.removing) {
+                            gem.scale -= 0.1;
+                            if (gem.scale <= 0) {
+                                grid[row][col] = null;
+                            }
+                            stillAnimating = true;
+                        }
+                    }
+                }
+            }
+
+            if (swapping) {
+                const { gem1, gem2, progress, reverse } = swapping;
+                const t = progress / 10;
+
+                const x1 = gem1.col * GEM_SIZE;
+                const y1 = gem1.row * GEM_SIZE;
+                const x2 = gem2.col * GEM_SIZE;
+                const y2 = gem2.row * GEM_SIZE;
+
+                if (!reverse) {
+                    // Animate both X and Y for visual swap
+                    grid[gem1.row][gem1.col].x = x1 + (x2 - x1) * t;
+                    grid[gem1.row][gem1.col].y = y1 + (y2 - y1) * t;
+                    grid[gem2.row][gem2.col].x = x2 + (x1 - x2) * t;
+                    grid[gem2.row][gem2.col].y = y2 + (y1 - y2) * t;
+                } else {
+                    // Animate swap back
+                    grid[gem1.row][gem1.col].x = x1 + (x2 - x1) * (1 - t);
+                    grid[gem1.row][gem1.col].y = y1 + (y2 - y1) * (1 - t);
+                    grid[gem2.row][gem2.col].x = x2 + (x1 - x2) * (1 - t);
+                    grid[gem2.row][gem2.col].y = y2 + (y1 - y2) * (1 - t);
+                }
+
+                swapping.progress++;
+                if (swapping.progress >= 10) {
+                    if (!reverse) {
+                        // Swap complete - check for matches
+                        const temp = grid[gem1.row][gem1.col];
+                        grid[gem1.row][gem1.col] = grid[gem2.row][gem2.col];
+                        grid[gem2.row][gem2.col] = temp;
+
+                        // Reset positions to grid positions
+                        grid[gem1.row][gem1.col].x = gem1.col * GEM_SIZE;
+                        grid[gem1.row][gem1.col].y = gem1.row * GEM_SIZE;
+                        grid[gem1.row][gem1.col].targetX = gem1.col * GEM_SIZE;
+                        grid[gem1.row][gem1.col].targetY = gem1.row * GEM_SIZE;
+                        grid[gem2.row][gem2.col].x = gem2.col * GEM_SIZE;
+                        grid[gem2.row][gem2.col].y = gem2.row * GEM_SIZE;
+                        grid[gem2.row][gem2.col].targetX = gem2.col * GEM_SIZE;
+                        grid[gem2.row][gem2.col].targetY = gem2.row * GEM_SIZE;
+
+                        const matches = findMatches();
+                        if (matches.length === 0) {
+                            // Swap back
+                            swapping = { gem1, gem2, progress: 0, reverse: true };
+                            stillAnimating = true;
+                        } else {
+                            swapping = null;
+                            removeMatches(matches);
+                            moves--;
+                            updateUI();
+                            stillAnimating = true;
+                        }
+                    } else {
+                        // Swap back complete
+                        const temp = grid[gem1.row][gem1.col];
+                        grid[gem1.row][gem1.col] = grid[gem2.row][gem2.col];
+                        grid[gem2.row][gem2.col] = temp;
+
+                        grid[gem1.row][gem1.col].x = gem1.col * GEM_SIZE;
+                        grid[gem1.row][gem1.col].y = gem1.row * GEM_SIZE;
+                        grid[gem2.row][gem2.col].x = gem2.col * GEM_SIZE;
+                        grid[gem2.row][gem2.col].y = gem2.row * GEM_SIZE;
+
+                        swapping = null;
+                    }
+                } else {
+                    stillAnimating = true;
+                }
+            }
+
+            draw();
+
+            if (stillAnimating) {
+                animating = true;
+                requestAnimationFrame(animate);
+            } else {
+                // Check for cascades
+                const hasEmpty = fillEmpty();
+                if (hasEmpty) {
+                    requestAnimationFrame(animate);
+                } else {
+                    const matches = findMatches();
+                    if (matches.length > 0) {
+                        removeMatches(matches);
+                        requestAnimationFrame(animate);
+                    } else {
+                        animating = false;
+                        checkGameState();
+                    }
+                }
+            }
+        }
+
+        function findMatches() {
+            const matches = new Set();
+
+            // Horizontal matches
+            for (let row = 0; row < GRID_SIZE; row++) {
+                for (let col = 0; col < GRID_SIZE - 2; col++) {
+                    const type = grid[row][col]?.type;
+                    if (type !== undefined &&
+                        grid[row][col+1]?.type === type &&
+                        grid[row][col+2]?.type === type) {
+                        matches.add(`${row},${col}`);
+                        matches.add(`${row},${col+1}`);
+                        matches.add(`${row},${col+2}`);
+                        // Check for 4+ match
+                        if (col + 3 < GRID_SIZE && grid[row][col+3]?.type === type) {
+                            matches.add(`${row},${col+3}`);
+                        }
+                        if (col + 4 < GRID_SIZE && grid[row][col+4]?.type === type) {
+                            matches.add(`${row},${col+4}`);
+                        }
+                    }
+                }
+            }
+
+            // Vertical matches
+            for (let row = 0; row < GRID_SIZE - 2; row++) {
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    const type = grid[row][col]?.type;
+                    if (type !== undefined &&
+                        grid[row+1]?.[col]?.type === type &&
+                        grid[row+2]?.[col]?.type === type) {
+                        matches.add(`${row},${col}`);
+                        matches.add(`${row+1},${col}`);
+                        matches.add(`${row+2},${col}`);
+                        // Check for 4+ match
+                        if (row + 3 < GRID_SIZE && grid[row+3]?.[col]?.type === type) {
+                            matches.add(`${row+3},${col}`);
+                        }
+                        if (row + 4 < GRID_SIZE && grid[row+4]?.[col]?.type === type) {
+                            matches.add(`${row+4},${col}`);
+                        }
+                    }
+                }
+            }
+
+            return Array.from(matches).map(s => {
+                const [row, col] = s.split(',').map(Number);
+                return { row, col };
+            });
+        }
+
+        function removeMatches(matches) {
+            const points = matches.length * 10 * (1 + Math.floor(matches.length / 4) * 0.5);
+            score += Math.floor(points);
+
+            matches.forEach(({ row, col }) => {
+                if (grid[row][col]) {
+                    grid[row][col].removing = true;
+                }
+            });
+
+            updateUI();
+        }
+
+        function fillEmpty() {
+            let hasEmpty = false;
+
+            // Drop existing gems
+            for (let col = 0; col < GRID_SIZE; col++) {
+                let emptyRow = GRID_SIZE - 1;
+                for (let row = GRID_SIZE - 1; row >= 0; row--) {
+                    if (grid[row][col]) {
+                        if (row !== emptyRow) {
+                            grid[emptyRow][col] = grid[row][col];
+                            grid[emptyRow][col].targetY = emptyRow * GEM_SIZE;
+                            grid[row][col] = null;
+                            hasEmpty = true;
+                        }
+                        emptyRow--;
+                    }
+                }
+
+                // Fill top with new gems
+                for (let row = emptyRow; row >= 0; row--) {
+                    let type;
+                    do {
+                        type = Math.floor(Math.random() * GEM_TYPES.length);
+                    } while (false); // Allow initial matches for cascade fun
+
+                    grid[row][col] = {
+                        type,
+                        x: col * GEM_SIZE,
+                        y: (row - emptyRow - 1) * GEM_SIZE,
+                        targetX: col * GEM_SIZE,
+                        targetY: row * GEM_SIZE,
+                        scale: 1,
+                        removing: false
+                    };
+                    hasEmpty = true;
+                }
+            }
+
+            return hasEmpty;
+        }
+
+        function updateUI() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('level').textContent = level;
+            document.getElementById('target').textContent = target;
+            document.getElementById('moves').textContent = moves;
+            document.getElementById('movesFill').style.width = (moves / maxMoves * 100) + '%';
+        }
+
+        function checkGameState() {
+            if (score >= target) {
+                document.getElementById('winScore').textContent = score;
+                document.getElementById('winOverlay').classList.add('active');
+            } else if (moves <= 0) {
+                document.getElementById('loseScore').textContent = score;
+                document.getElementById('loseOverlay').classList.add('active');
+            }
+        }
+
+        function nextLevel() {
+            level++;
+            target = 1000 + (level - 1) * 500;
+            maxMoves = Math.max(20, 30 - (level - 1) * 2);
+            moves = maxMoves;
+            createGrid();
+            updateUI();
+            document.getElementById('winOverlay').classList.remove('active');
+            draw();
+        }
+
+        function restartGame() {
+            level = 1;
+            score = 0;
+            target = 1000;
+            maxMoves = 30;
+            moves = maxMoves;
+            createGrid();
+            updateUI();
+            document.getElementById('loseOverlay').classList.remove('active');
+            draw();
+        }
+
+        canvas.addEventListener('click', (e) => {
+            if (animating) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const col = Math.floor(x / GEM_SIZE);
+            const row = Math.floor(y / GEM_SIZE);
+
+            if (row < 0 || row >= GRID_SIZE || col < 0 || col >= GRID_SIZE) return;
+
+            if (!selected) {
+                selected = { row, col };
+            } else {
+                // Check if adjacent
+                const dr = Math.abs(row - selected.row);
+                const dc = Math.abs(col - selected.col);
+
+                if ((dr === 1 && dc === 0) || (dr === 0 && dc === 1)) {
+                    // Start swap animation
+                    swapping = {
+                        gem1: { row: selected.row, col: selected.col },
+                        gem2: { row, col },
+                        progress: 0,
+                        reverse: false
+                    };
+                    selected = null;
+                    animating = true;
+                    requestAnimationFrame(animate);
+                } else {
+                    selected = { row, col };
+                }
+            }
+            draw();
+        });
+
+        // Initialize
+        createParticles();
+        createGrid();
+        updateUI();
+        draw();
+    </script>
+</body>
+</html>

@@ -3,7 +3,10 @@ import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import EraFooter from "@/components/EraFooter";
 import EasterEgg from "@/components/EasterEgg";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
+import ReCaptchaProvider from "@/components/ReCaptchaProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -48,9 +51,13 @@ export default function RootLayout({
         <EasterEgg />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
-        <Header />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+        <GoogleAnalytics />
+        <ReCaptchaProvider>
+          <Header />
+          <main className="min-h-screen pb-14">{children}</main>
+          <Footer />
+          <EraFooter />
+        </ReCaptchaProvider>
         <Analytics />
       </body>
     </html>

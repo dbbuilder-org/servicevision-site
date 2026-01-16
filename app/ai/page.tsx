@@ -58,6 +58,9 @@ export default function AIPage() {
   const [isTyping, setIsTyping] = useState(false);
   const [currentTypingText, setCurrentTypingText] = useState("");
   const [pendingAnswer, setPendingAnswer] = useState<string | null>(null);
+  const [showAdventure, setShowAdventure] = useState(false);
+  const [secretCode, setSecretCode] = useState("");
+  const [hasInteracted, setHasInteracted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Initial greeting
@@ -70,10 +73,32 @@ export default function AIPage() {
     setMessages([greeting]);
   }, []);
 
-  // Auto-scroll to bottom
+  // Secret code "zork" or "adventure" to trigger game
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, currentTypingText]);
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+      const newCode = (secretCode + e.key).slice(-9).toLowerCase();
+      setSecretCode(newCode);
+
+      if (newCode.includes("zork") || newCode.includes("adventure")) {
+        setShowAdventure(true);
+        setSecretCode("");
+      }
+    };
+
+    window.addEventListener("keypress", handleKeyPress);
+    return () => window.removeEventListener("keypress", handleKeyPress);
+  }, [secretCode]);
+
+  // Auto-scroll within messages container only after user interaction
+  useEffect(() => {
+    if (hasInteracted && messagesEndRef.current) {
+      // Use scrollIntoView with block: "nearest" to avoid page-level scrolling
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [messages, currentTypingText, hasInteracted]);
 
   // Typing animation effect
   useEffect(() => {
@@ -98,6 +123,9 @@ export default function AIPage() {
 
   const handleTopicClick = (topic: typeof aiTopics[0]) => {
     if (isTyping) return;
+
+    // Mark as interacted for auto-scroll
+    setHasInteracted(true);
 
     // Add user question
     setMessages((prev) => [
@@ -232,9 +260,47 @@ export default function AIPage() {
             >
               [About Us]
             </Link>
+            <button
+              onClick={() => setShowAdventure(true)}
+              className="font-mono text-sm text-gray-600 hover:text-emerald-400 transition-colors"
+              title="Type 'zork' anywhere on this page..."
+            >
+              [???]
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Text Adventure Game Easter Egg */}
+      {showAdventure && (
+        <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
+          <div className="bg-[#111] border-b border-[#333] px-4 py-2 flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-3">
+              <span className="text-emerald-400 font-mono text-sm">SERVICEVISION ARCADE</span>
+              <span className="text-gray-600 font-mono text-xs">// The Silicon Frontier</span>
+            </div>
+            <button
+              onClick={() => setShowAdventure(false)}
+              className="text-gray-400 hover:text-white transition-colors font-mono text-sm flex items-center gap-2"
+            >
+              <span className="text-xs text-gray-600">[ESC]</span>
+              Close
+            </button>
+          </div>
+          <div className="flex-1 flex items-center justify-center p-4 min-h-0">
+            <iframe
+              src="/games/adventure.html"
+              className="w-full h-full max-w-[900px] max-h-[700px] border-0 rounded-lg"
+              title="The Silicon Frontier"
+            />
+          </div>
+          <div className="bg-[#111] border-t border-[#333] px-4 py-2 text-center shrink-0">
+            <span className="text-gray-500 font-mono text-xs">
+              Type commands like LOOK, GO NORTH, TAKE item, TALK person • ESC to exit
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

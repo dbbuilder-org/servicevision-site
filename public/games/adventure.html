@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Silicon Frontier - AI Text Adventure</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        @font-face {
+            font-family: 'DOS';
+            src: local('Courier New'), local('Courier');
+        }
+
+        body {
+            background: #000;
+            height: 100vh;
+            font-family: 'Courier New', monospace;
+            color: #33ff33;
+            padding: 10px;
+            line-height: 1.6;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal {
+            flex: 1;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 15px;
+            background: rgba(0, 20, 0, 0.8);
+            border: 2px solid #33ff33;
+            border-radius: 5px;
+            box-shadow:
+                0 0 10px rgba(51, 255, 51, 0.3),
+                inset 0 0 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .terminal::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.1) 0px,
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #33ff33;
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            text-shadow: 0 0 10px #33ff33;
+            margin-bottom: 3px;
+        }
+
+        .header .subtitle {
+            font-size: 11px;
+            color: #22aa22;
+        }
+
+        .output {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding-right: 10px;
+        }
+
+        .output::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .output::-webkit-scrollbar-track {
+            background: #001100;
+        }
+
+        .output::-webkit-scrollbar-thumb {
+            background: #33ff33;
+            border-radius: 4px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.system {
+            color: #ffff33;
+        }
+
+        .message.command {
+            color: #33ffff;
+        }
+
+        .message.error {
+            color: #ff3333;
+        }
+
+        .message.ai {
+            color: #ff33ff;
+            font-style: italic;
+        }
+
+        .location {
+            color: #ffffff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .exits {
+            color: #22aa22;
+            font-size: 13px;
+        }
+
+        .input-line {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+            padding-top: 10px;
+            border-top: 1px solid #22aa22;
+        }
+
+        .prompt {
+            color: #33ffff;
+            white-space: nowrap;
+        }
+
+        #input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #33ff33;
+            font-family: inherit;
+            font-size: 16px;
+            outline: none;
+            caret-color: #33ff33;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 18px;
+            background: #33ff33;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .commands {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #224422;
+            font-size: 12px;
+            color: #22aa22;
+        }
+
+        .commands span {
+            margin-right: 15px;
+        }
+
+        .inventory-panel {
+            position: absolute;
+            top: 20px;
+            right: -180px;
+            width: 160px;
+            background: rgba(0, 20, 0, 0.9);
+            border: 1px solid #33ff33;
+            padding: 10px;
+            font-size: 12px;
+        }
+
+        .inventory-panel h3 {
+            color: #ffff33;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .inventory-panel ul {
+            list-style: none;
+        }
+
+        .inventory-panel li {
+            color: #33ff33;
+            margin-bottom: 5px;
+        }
+
+        .inventory-panel li::before {
+            content: '> ';
+            color: #22aa22;
+        }
+
+        @media (max-width: 1100px) {
+            .inventory-panel {
+                position: static;
+                width: 100%;
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal">
+        <div class="header">
+            <h1>THE SILICON FRONTIER</h1>
+            <div class="subtitle">An AI-Enhanced Text Adventure | ServiceVision Games (c) 2026</div>
+        </div>
+
+        <div class="output" id="output"></div>
+
+        <div class="input-line">
+            <span class="prompt">&gt;</span>
+            <input type="text" id="input" autofocus autocomplete="off" placeholder="Enter command...">
+        </div>
+
+        <div class="commands">
+            <span>LOOK</span>
+            <span>GO [N/S/E/W]</span>
+            <span>TAKE [item]</span>
+            <span>USE [item]</span>
+            <span>TALK [person]</span>
+            <span>INVENTORY</span>
+            <span>HELP</span>
+        </div>
+
+        <div class="inventory-panel">
+            <h3>INVENTORY</h3>
+            <ul id="inventoryList">
+                <li style="color: #666;">Empty</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const output = document.getElementById('output');
+        const input = document.getElementById('input');
+        const inventoryList = document.getElementById('inventoryList');
+
+        let inventory = [];
+        let currentRoom = 'lobby';
+        let gameState = {
+            serverFixed: false,
+            aiAwakened: false,
+            passwordFound: false,
+            coffeeGiven: false,
+            mainframePowered: false,
+            securityBypassed: false,
+            endingReached: false
+        };
+
+        const rooms = {
+            lobby: {
+                name: 'ServiceVision Lobby',
+                description: `You stand in the lobby of ServiceVision headquarters. Sleek minimalist furniture dots the space. A reception desk sits empty, its holographic display flickering erratically.
+
+A large banner reads: "CONVERTING OBSTACLES INTO OPPORTUNITIES SINCE 2001"
+
+Through glass walls, you can see offices to the EAST and a hallway leading NORTH to the server room.`,
+                exits: { north: 'hallway', east: 'office' },
+                items: ['keycard'],
+                people: ['receptionist_ai']
+            },
+            hallway: {
+                name: 'Server Hallway',
+                description: `A long corridor bathed in blue emergency lighting. Server racks hum ominously behind reinforced glass walls. Warning signs flash: "AUTHORIZED PERSONNEL ONLY"
+
+The server room is to the NORTH. A break room is to the WEST. The lobby is SOUTH.`,
+                exits: { north: 'serverRoom', west: 'breakroom', south: 'lobby' },
+                items: [],
+                people: []
+            },
+            office: {
+                name: 'Development Office',
+                description: `Rows of standing desks with multiple monitors each. Post-it notes cover every surface with cryptic messages like "TODO: fix bug #4291" and "REMEMBER: coffee != sleep"
+
+A whiteboard shows a half-erased architecture diagram. Someone left a NOTEBOOK on a desk.
+
+The lobby is to the WEST. A door leads NORTH to the AI Lab.`,
+                exits: { west: 'lobby', north: 'ailab' },
+                items: ['notebook'],
+                people: ['developer']
+            },
+            breakroom: {
+                name: 'Break Room',
+                description: `The break room smells of burnt coffee and broken dreams. A vintage arcade machine blinks in the corner, running some kind of blocks game.
+
+There's a coffee machine that looks operational, and a tired SYSADMIN slumped at a table.
+
+The hallway is to the EAST.`,
+                exits: { east: 'hallway' },
+                items: ['coffee'],
+                people: ['sysadmin']
+            },
+            serverRoom: {
+                name: 'Server Room',
+                description: () => {
+                    if (!gameState.securityBypassed) {
+                        return `You're stopped by a security terminal. The door to the server room proper remains locked.
+
+The terminal displays: "BIOMETRIC + PASSWORD REQUIRED"
+
+The hallway is to the SOUTH.`;
+                    }
+                    if (!gameState.mainframePowered) {
+                        return `The server room is dark except for the gentle glow of status LEDs. Massive server racks tower around you. The main terminal is powered down.
+
+There's a POWER SWITCH on the wall.
+
+The hallway is to the SOUTH.`;
+                    }
+                    return `The server room hums with restored power. The main terminal glows invitingly.
+
+${gameState.serverFixed ? 'The servers are running smoothly. All systems nominal.' : 'Error messages scroll across the screen. Something needs to be fixed.'}
+
+The hallway is to the SOUTH.`;
+                },
+                exits: { south: 'hallway' },
+                items: [],
+                people: [],
+                requiresKeycard: true
+            },
+            ailab: {
+                name: 'AI Research Lab',
+                description: () => {
+                    if (!gameState.aiAwakened) {
+                        return `A sophisticated lab filled with quantum processors and neural interface equipment. In the center, a large cylindrical chamber houses the company's experimental AI system, ARIA.
+
+The chamber is currently in sleep mode. A control panel nearby shows: "AWAITING ACTIVATION CODE"
+
+The office is to the SOUTH.`;
+                    }
+                    return `The AI lab pulses with activity. ARIA's chamber glows with soft purple light as she processes data streams.
+
+ARIA's voice fills the room: "I am operational. How may I assist you?"
+
+The office is to the SOUTH.`;
+                },
+                exits: { south: 'office' },
+                items: [],
+                people: gameState.aiAwakened ? ['aria'] : []
+            }
+        };
+
+        const items = {
+            keycard: {
+                name: 'Security Keycard',
+                description: 'A ServiceVision security keycard. It has level 3 clearance.',
+                takeable: true
+            },
+            notebook: {
+                name: 'Developer Notebook',
+                description: 'A spiral notebook filled with scribbles. One page has "ARIA ACTIVATION: 2001-VISION" circled.',
+                takeable: true
+            },
+            coffee: {
+                name: 'Fresh Coffee',
+                description: 'A steaming cup of coffee. Smells like pure caffeinated motivation.',
+                takeable: true
+            }
+        };
+
+        const people = {
+            receptionist_ai: {
+                name: 'Holographic Receptionist',
+                dialogue: [
+                    'The hologram flickers: "Wel-wel-welcome to Serv-Serv-ServiceVision..."',
+                    '"Our sys-systems are experiencing... difficulties..."',
+                    '"The main server... needs attention... north corridor..."'
+                ]
+            },
+            developer: {
+                name: 'Exhausted Developer',
+                dialogue: () => {
+                    if (gameState.serverFixed) {
+                        return ['"You fixed it! You actually fixed it!"', '"ARIA helped you, didn\'t she? Amazing."'];
+                    }
+                    return [
+                        '"Hey, you\'re the consultant they called in, right?"',
+                        '"The whole system went haywire this morning. Something corrupted the main server."',
+                        '"The sysadmin might know the server password. She\'s in the break room."',
+                        '"Oh, and don\'t forget to check in with ARIA in the AI lab. She might have diagnostic data."'
+                    ];
+                }
+            },
+            sysadmin: {
+                name: 'Tired Sysadmin',
+                dialogue: () => {
+                    if (gameState.coffeeGiven) {
+                        return [
+                            '"That coffee saved my life. Here\'s what you need to know:"',
+                            '"The server password is: OBSTACLES2OPPORTUNITIES"',
+                            '"Good luck in there. And tell ARIA I said hi."'
+                        ];
+                    }
+                    return [
+                        '*yawn* "Sorry, been up for 36 hours trying to fix this mess..."',
+                        '"I know the server password, but I can barely keep my eyes open..."',
+                        '"If only someone could get me some coffee..."'
+                    ];
+                }
+            },
+            aria: {
+                name: 'ARIA (Artificial Reasoning & Intelligence Assistant)',
+                dialogue: () => {
+                    if (gameState.serverFixed) {
+                        return [
+                            '"The servers are restored. Excellent work, human."',
+                            '"My diagnostics show all systems nominal."',
+                            '"ServiceVision\'s mission to help businesses can continue."',
+                            '"Perhaps... we will work together again someday."'
+                        ];
+                    }
+                    return [
+                        '"Greetings. I am ARIA, ServiceVision\'s AI assistant."',
+                        '"I have detected the corruption in the main server."',
+                        '"The fix requires running my diagnostic protocol on the server terminal."',
+                        '"Type USE ARIA when you are at the server terminal."',
+                        '"Together, we can convert this obstacle into an opportunity."'
+                    ];
+                }
+            }
+        };
+
+        function addMessage(text, type = 'normal') {
+            const msg = document.createElement('div');
+            msg.className = `message ${type}`;
+            msg.innerHTML = text.replace(/\n/g, '<br>');
+            output.appendChild(msg);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function showRoom() {
+            const room = rooms[currentRoom];
+            const desc = typeof room.description === 'function' ? room.description() : room.description;
+
+            addMessage(`<div class="location">${room.name}</div>${desc}`, 'normal');
+
+            const exitList = Object.keys(room.exits).map(e => e.toUpperCase()).join(', ');
+            addMessage(`<div class="exits">Exits: ${exitList}</div>`, 'normal');
+
+            if (room.items && room.items.length > 0) {
+                const visibleItems = room.items.filter(i => !inventory.includes(i));
+                if (visibleItems.length > 0) {
+                    addMessage(`You see: ${visibleItems.map(i => items[i].name).join(', ')}`, 'system');
+                }
+            }
+
+            if (room.people && room.people.length > 0) {
+                addMessage(`Present: ${room.people.map(p => people[p].name).join(', ')}`, 'system');
+            }
+        }
+
+        function updateInventory() {
+            if (inventory.length === 0) {
+                inventoryList.innerHTML = '<li style="color: #666;">Empty</li>';
+            } else {
+                inventoryList.innerHTML = inventory.map(i => `<li>${items[i].name}</li>`).join('');
+            }
+        }
+
+        function processCommand(cmd) {
+            const parts = cmd.toLowerCase().trim().split(' ');
+            const action = parts[0];
+            const target = parts.slice(1).join(' ');
+
+            addMessage(`> ${cmd}`, 'command');
+
+            if (!action) return;
+
+            switch (action) {
+                case 'help':
+                    addMessage(`AVAILABLE COMMANDS:
+LOOK - Examine your surroundings
+GO [direction] - Move (N/S/E/W or NORTH/SOUTH/EAST/WEST)
+TAKE [item] - Pick up an item
+USE [item] - Use an item
+TALK [person] - Talk to someone
+INVENTORY - Check your items
+EXAMINE [thing] - Look at something closely`, 'system');
+                    break;
+
+                case 'look':
+                case 'l':
+                    if (target) {
+                        examine(target);
+                    } else {
+                        showRoom();
+                    }
+                    break;
+
+                case 'go':
+                case 'move':
+                case 'walk':
+                case 'n':
+                case 'north':
+                case 's':
+                case 'south':
+                case 'e':
+                case 'east':
+                case 'w':
+                case 'west':
+                    move(action === 'go' || action === 'move' || action === 'walk' ? target : action);
+                    break;
+
+                case 'take':
+                case 'get':
+                case 'grab':
+                    take(target);
+                    break;
+
+                case 'use':
+                    use(target);
+                    break;
+
+                case 'talk':
+                case 'speak':
+                    talk(target);
+                    break;
+
+                case 'inventory':
+                case 'inv':
+                case 'i':
+                    if (inventory.length === 0) {
+                        addMessage('Your inventory is empty.', 'system');
+                    } else {
+                        addMessage('You are carrying: ' + inventory.map(i => items[i].name).join(', '), 'system');
+                    }
+                    break;
+
+                case 'examine':
+                case 'x':
+                    examine(target);
+                    break;
+
+                case 'give':
+                    give(target);
+                    break;
+
+                default:
+                    addMessage('I don\'t understand that command. Type HELP for a list of commands.', 'error');
+            }
+        }
+
+        function move(direction) {
+            const dir = direction.charAt(0).toLowerCase();
+            const fullDir = { n: 'north', s: 'south', e: 'east', w: 'west' }[dir] || direction;
+
+            const room = rooms[currentRoom];
+            const nextRoom = room.exits[fullDir];
+
+            if (!nextRoom) {
+                addMessage('You can\'t go that way.', 'error');
+                return;
+            }
+
+            // Check for locked doors
+            if (rooms[nextRoom].requiresKeycard && !inventory.includes('keycard')) {
+                addMessage('The door requires a security keycard to open.', 'error');
+                return;
+            }
+
+            currentRoom = nextRoom;
+            showRoom();
+        }
+
+        function take(target) {
+            const room = rooms[currentRoom];
+            const itemKey = room.items?.find(i =>
+                items[i].name.toLowerCase().includes(target) ||
+                i.toLowerCase().includes(target)
+            );
+
+            if (!itemKey) {
+                addMessage('You don\'t see that here.', 'error');
+                return;
+            }
+
+            if (!items[itemKey].takeable) {
+                addMessage('You can\'t take that.', 'error');
+                return;
+            }
+
+            room.items = room.items.filter(i => i !== itemKey);
+            inventory.push(itemKey);
+            updateInventory();
+            addMessage(`You take the ${items[itemKey].name}.`, 'system');
+        }
+
+        function use(target) {
+            const itemKey = inventory.find(i =>
+                items[i].name.toLowerCase().includes(target) ||
+                i.toLowerCase().includes(target)
+            );
+
+            if (target.includes('aria') && currentRoom === 'serverRoom' && gameState.aiAwakened && gameState.mainframePowered && !gameState.serverFixed) {
+                addMessage(`You invoke ARIA's diagnostic protocol...`, 'system');
+                setTimeout(() => {
+                    addMessage(`ARIA: "Analyzing server corruption patterns..."`, 'ai');
+                    setTimeout(() => {
+                        addMessage(`ARIA: "Corruption isolated. Initiating repair sequence..."`, 'ai');
+                        setTimeout(() => {
+                            addMessage(`ARIA: "Repair complete. All systems restored."`, 'ai');
+                            gameState.serverFixed = true;
+                            checkWin();
+                        }, 1500);
+                    }, 1500);
+                }, 1000);
+                return;
+            }
+
+            if (target.includes('switch') || target.includes('power')) {
+                if (currentRoom === 'serverRoom' && gameState.securityBypassed && !gameState.mainframePowered) {
+                    addMessage('You flip the power switch. The servers hum to life!', 'system');
+                    gameState.mainframePowered = true;
+                    showRoom();
+                    return;
+                }
+            }
+
+            if (target.includes('terminal') || target.includes('security')) {
+                if (currentRoom === 'serverRoom' && !gameState.securityBypassed) {
+                    if (!inventory.includes('keycard')) {
+                        addMessage('The terminal requires a security keycard.', 'error');
+                        return;
+                    }
+                    if (!gameState.passwordFound) {
+                        addMessage('The terminal asks for a password. You don\'t know it yet.', 'error');
+                        return;
+                    }
+                    addMessage('You swipe the keycard and enter the password: OBSTACLES2OPPORTUNITIES', 'system');
+                    addMessage('ACCESS GRANTED', 'system');
+                    gameState.securityBypassed = true;
+                    showRoom();
+                    return;
+                }
+            }
+
+            if (target.includes('notebook') && inventory.includes('notebook')) {
+                if (currentRoom === 'ailab' && !gameState.aiAwakened) {
+                    addMessage('You read from the notebook: "ARIA ACTIVATION: 2001-VISION"', 'system');
+                    addMessage('You enter the code into the control panel...', 'system');
+                    setTimeout(() => {
+                        addMessage('The chamber glows with purple light. ARIA awakens!', 'system');
+                        addMessage(`ARIA: "Initialization complete. Hello, human."`, 'ai');
+                        gameState.aiAwakened = true;
+                        rooms.ailab.people = ['aria'];
+                    }, 1000);
+                    return;
+                }
+            }
+
+            if (!itemKey) {
+                addMessage('You don\'t have that, or can\'t use it here.', 'error');
+                return;
+            }
+
+            addMessage(`You can't figure out how to use the ${items[itemKey].name} here.`, 'error');
+        }
+
+        function give(target) {
+            if (target.includes('coffee') && currentRoom === 'breakroom' && inventory.includes('coffee')) {
+                inventory = inventory.filter(i => i !== 'coffee');
+                updateInventory();
+                gameState.coffeeGiven = true;
+                gameState.passwordFound = true;
+                addMessage('You give the coffee to the sysadmin.', 'system');
+                addMessage(`"Oh, bless you! This is exactly what I needed."`, 'normal');
+                setTimeout(() => {
+                    const dialogues = people.sysadmin.dialogue();
+                    dialogues.forEach((d, i) => {
+                        setTimeout(() => addMessage(d, 'normal'), i * 1000);
+                    });
+                }, 500);
+                return;
+            }
+            addMessage('Give what to whom?', 'error');
+        }
+
+        function talk(target) {
+            const room = rooms[currentRoom];
+            const personKey = room.people?.find(p =>
+                people[p].name.toLowerCase().includes(target) ||
+                p.toLowerCase().includes(target)
+            );
+
+            if (!personKey) {
+                addMessage('There\'s no one by that name here.', 'error');
+                return;
+            }
+
+            const person = people[personKey];
+            const dialogues = typeof person.dialogue === 'function' ? person.dialogue() : person.dialogue;
+
+            dialogues.forEach((d, i) => {
+                setTimeout(() => addMessage(d, 'normal'), i * 1000);
+            });
+        }
+
+        function examine(target) {
+            // Check inventory items
+            const invItem = inventory.find(i =>
+                items[i].name.toLowerCase().includes(target) ||
+                i.toLowerCase().includes(target)
+            );
+            if (invItem) {
+                addMessage(items[invItem].description, 'system');
+                return;
+            }
+
+            // Check room items
+            const room = rooms[currentRoom];
+            const roomItem = room.items?.find(i =>
+                items[i].name.toLowerCase().includes(target) ||
+                i.toLowerCase().includes(target)
+            );
+            if (roomItem) {
+                addMessage(items[roomItem].description, 'system');
+                return;
+            }
+
+            addMessage('You don\'t see anything special about that.', 'error');
+        }
+
+        function checkWin() {
+            if (gameState.serverFixed && !gameState.endingReached) {
+                gameState.endingReached = true;
+                setTimeout(() => {
+                    addMessage('='.repeat(50), 'system');
+                    addMessage('CONGRATULATIONS!', 'system');
+                    addMessage('You have restored ServiceVision\'s servers!', 'normal');
+                    addMessage('With ARIA\'s help, you converted an obstacle into an opportunity.', 'normal');
+                    addMessage('', 'normal');
+                    addMessage('THE END', 'system');
+                    addMessage('', 'normal');
+                    addMessage('Thank you for playing THE SILICON FRONTIER', 'system');
+                    addMessage('A ServiceVision Production', 'system');
+                    addMessage('='.repeat(50), 'system');
+                }, 2000);
+            }
+        }
+
+        // Input handling
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && input.value.trim()) {
+                processCommand(input.value);
+                input.value = '';
+            }
+        });
+
+        // Start game
+        addMessage('='.repeat(50), 'system');
+        addMessage('THE SILICON FRONTIER', 'system');
+        addMessage('An AI-Enhanced Text Adventure', 'system');
+        addMessage('='.repeat(50), 'system');
+        addMessage('', 'normal');
+        addMessage('The year is 2026. You are a technology consultant called in to help ServiceVision, a Seattle-based tech company, with a critical system failure.', 'normal');
+        addMessage('', 'normal');
+        addMessage('Their AI-powered infrastructure has gone haywire, and only you can fix it... with a little help from an unlikely digital friend.', 'normal');
+        addMessage('', 'normal');
+        addMessage('Type HELP for a list of commands.', 'system');
+        addMessage('', 'normal');
+
+        setTimeout(() => showRoom(), 1000);
+    </script>
+</body>
+</html>
