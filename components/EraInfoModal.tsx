@@ -171,7 +171,7 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle, f
                   onClick={handleDismiss}
                   className="bg-white/5 hover:bg-white/10 text-gray-300 font-medium px-6 py-3 rounded-xl text-center transition-colors border border-white/10 whitespace-nowrap"
                 >
-                  Explore First
+                  Explore our site first
                 </button>
               </div>
             </div>
