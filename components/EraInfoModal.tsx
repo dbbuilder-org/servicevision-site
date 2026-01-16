@@ -105,14 +105,16 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle }:
                   </div>
                   <div>
                     <h2 className="text-lg md:text-xl font-bold text-white">
-                      Remember {eraName}?
+                      Remember the {eraName}?
                     </h2>
                     <p className="text-xs text-purple-400 font-mono">{eraYear}</p>
                   </div>
                 </div>
 
                 {/* Toggle */}
-                <div className="flex items-center gap-3 bg-black/30 rounded-full px-4 py-2 border border-white/5">
+                <div className="flex flex-col items-center gap-1">
+                  <span className="text-[10px] text-gray-500 uppercase tracking-wider">Toggle between eras</span>
+                  <div className="flex items-center gap-3 bg-black/30 rounded-full px-4 py-2 border border-white/5">
                   <span className={`text-sm font-mono transition-colors ${!showModern ? "text-white font-semibold" : "text-gray-500"}`}>
                     {eraYear}
                   </span>
