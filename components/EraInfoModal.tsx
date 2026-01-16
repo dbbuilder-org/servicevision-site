@@ -120,7 +120,7 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle, f
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
 
               {/* Left 1/3: Header + Toggle */}
-              <div className="flex flex-col justify-center items-center lg:items-start">
+              <div className="flex flex-col justify-start items-center lg:items-start">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/30 to-purple-600/20 border border-purple-500/30 flex items-center justify-center shadow-lg shadow-purple-500/20">
                     <span className="text-xl">⚡</span>
@@ -157,14 +157,16 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle, f
               </div>
 
               {/* Center 1/3: Copy */}
-              <div className="flex flex-col justify-center">
+              <div className="flex flex-col justify-start">
+                <p className="text-white font-bold text-base md:text-lg mb-2">We sure do.</p>
                 <p className="text-gray-300 text-sm leading-relaxed mb-3">
-                  We do too. All that progress since then? <span className="text-purple-400">ServiceVision AI</span> delivers that level of transformation—fast. Here's the proof:
+                  <span className="text-purple-400">ServiceVision AI</span> delivers transformation that used to take years in days—and with compliance-first, battle-tested code under the covers.
                 </p>
+                <p className="text-gray-400 text-sm mb-2">You're looking at proof of our velocity and quality:</p>
                 <p className="text-emerald-400 text-sm leading-relaxed">
                   We built this site—interface, games, backend—in <span className="text-white font-bold">under 12 hours</span> with one senior engineer and our AI agents trained on our best practices.
                 </p>
-                <p className="text-white font-semibold text-sm md:text-base mt-2">
+                <p className="text-white font-semibold text-sm md:text-base mt-3">
                   Imagine what 12 hours with <span className="text-purple-400">ServiceVision</span> could do to revolutionize your <span className={`inline-block min-w-[70px] text-purple-400 transition-all duration-200 ${isRotating ? "opacity-90" : "opacity-100"}`}>{rotatingWords[currentWordIndex]}</span>.
                 </p>
               </div>
