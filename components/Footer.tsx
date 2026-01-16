@@ -37,7 +37,10 @@ const navigation: {
 
 export default function Footer() {
   return (
-    <footer className="bg-[#0a0a0a] border-t border-[#2a2a2a]">
+    <footer className="bg-[#0a0a0a]">
+      {/* Gradient separator */}
+      <div className="h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
+      <div className="h-16 bg-gradient-to-b from-purple-900/20 to-transparent" />
       <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
         {/* Terminal-style header */}
         <div className="font-mono text-sm text-gray-500 mb-12">
