@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import EraToggle from "@/components/EraToggle";
 
 interface Article {
   id: string;
@@ -19,553 +20,358 @@ interface LibraryClientProps {
   categories: string[];
 }
 
-// Easter egg messages
-const teamNotes = [
-  { trigger: "sync", note: "Real engineers don't just sync—they ship. And pick up the phone." },
-  { trigger: "cloud", note: "We've been doing 'cloud' since it was called 'someone else's computer.'" },
-  { trigger: "enterprise", note: "Enterprise-ready means audit-ready. We've been through the trenches." },
-  { trigger: "dashboard", note: "Dashboards are nice. Accountability is better. We provide both." },
-  { trigger: "integration", note: "We've integrated systems older than some developers. Experience matters." },
-  { trigger: "ai", note: "AI is a tool, not a replacement. 25 years taught us that." },
-  { trigger: "compliance", note: "SOC 2, HIPAA, audits... we've seen them all and shipped through them." },
-  { trigger: "legacy", note: "Legacy systems aren't problems—they're opportunities in disguise." },
-];
-
-export default function LibraryClient({ articles, categories }: LibraryClientProps) {
+// Modern Library UI (current clean design)
+function ModernLibrary({ articles, categories }: LibraryClientProps) {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [showNotification, setShowNotification] = useState(false);
-  const [notificationMessage, setNotificationMessage] = useState("");
-  const [syncProgress, setSyncProgress] = useState(100);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [showTeamNote, setShowTeamNote] = useState(false);
-  const [currentNote, setCurrentNote] = useState("");
-  const [easterEggClicks, setEasterEggClicks] = useState(0);
-  const [showAdminPanel, setShowAdminPanel] = useState(false);
 
-  // Filter articles
   const filteredArticles = articles.filter((article) => {
     const matchesCategory = selectedCategory === "All" || article.category === selectedCategory;
     const matchesSearch =
       searchQuery === "" ||
       article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+      article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
-  // Check for Easter egg triggers in search
-  useEffect(() => {
-    const note = teamNotes.find((n) => searchQuery.toLowerCase().includes(n.trigger));
-    if (note) {
-      setCurrentNote(note.note);
-      setShowTeamNote(true);
-      const timer = setTimeout(() => setShowTeamNote(false), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [searchQuery]);
-
-  // Fake sync animation
-  const handleSync = () => {
-    if (isSyncing) return;
-    setIsSyncing(true);
-    setSyncProgress(0);
-
-    const interval = setInterval(() => {
-      setSyncProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsSyncing(false);
-          setNotificationMessage("All resources synced successfully");
-          setShowNotification(true);
-          setTimeout(() => setShowNotification(false), 3000);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 200);
-  };
-
-  // Logo click Easter egg - reveals admin panel
-  const handleLogoClick = () => {
-    setEasterEggClicks((prev) => {
-      if (prev + 1 >= 5) {
-        setShowAdminPanel(true);
-        return 0;
-      }
-      return prev + 1;
-    });
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Enterprise Header Bar */}
-      <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14">
-            {/* Left: App Switcher */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={handleLogoClick}
-                className="flex items-center gap-2 text-indigo-600 font-semibold hover:text-indigo-700 transition-colors"
+    <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-20">
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Resource Library
+          </h1>
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+            Insights, guides, and best practices from our team. Built on 25 years of enterprise experience.
+          </p>
+        </div>
+
+        {/* Search & Filter Bar */}
+        <div className="bg-[#111] border border-[#222] rounded-xl p-4 mb-8">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 relative">
+              <svg
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">SV</span>
-                </div>
-                <span>ServiceVision Library</span>
-              </button>
-
-              <div className="hidden sm:flex items-center gap-1 text-sm text-gray-500">
-                <span className="px-2 py-1 bg-gray-100 rounded">Home</span>
-                <span className="text-gray-300">/</span>
-                <span className="px-2 py-1 bg-indigo-50 text-indigo-600 rounded">Resources</span>
-              </div>
-            </div>
-
-            {/* Right: Actions */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleSync}
-                className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-md border transition-all ${
-                  isSyncing
-                    ? "bg-indigo-50 border-indigo-200 text-indigo-600"
-                    : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <svg
-                  className={`w-4 h-4 ${isSyncing ? "animate-spin" : ""}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  />
-                </svg>
-                {isSyncing ? "Syncing..." : "Sync"}
-              </button>
-
-              <Link
-                href="/md"
-                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-                Markdown Editor
-              </Link>
-
-              <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white text-sm font-medium cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-emerald-400 transition-all">
-                CT
-              </div>
-            </div>
-          </div>
-
-          {/* Sync Progress Bar */}
-          {isSyncing && (
-            <div className="h-1 bg-gray-100 -mx-4 sm:-mx-6 lg:-mx-8">
-              <div
-                className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-200"
-                style={{ width: `${syncProgress}%` }}
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search articles..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500"
               />
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Notification Toast */}
-      {showNotification && (
-        <div className="fixed top-20 right-4 z-50 animate-slide-in">
-          <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-4 flex items-center gap-3">
-            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-              <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <p className="text-sm text-gray-700">{notificationMessage}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Team Note Easter Egg */}
-      {showTeamNote && (
-        <div className="fixed bottom-4 left-4 z-50 animate-slide-up">
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg shadow-xl p-4 max-w-sm">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-                <span className="text-lg">💡</span>
-              </div>
-              <div>
-                <p className="text-sm font-medium mb-1">A note from our team:</p>
-                <p className="text-sm text-white/90">{currentNote}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Hidden Admin Panel Easter Egg */}
-      {showAdminPanel && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-white font-semibold">Secret Admin Panel</h3>
+            <div className="flex gap-2 flex-wrap">
+              {categories.map((category) => (
                 <button
-                  onClick={() => setShowAdminPanel(false)}
-                  className="text-white/80 hover:text-white"
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    selectedCategory === category
+                      ? "bg-emerald-600 text-white"
+                      : "bg-[#1a1a1a] text-gray-400 hover:bg-[#222]"
+                  }`}
                 >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  {category}
                 </button>
-              </div>
-            </div>
-            <div className="p-6 space-y-4">
-              <div className="flex items-center gap-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
-                <span className="text-2xl">🎉</span>
-                <div>
-                  <p className="font-medium text-amber-800">You found it!</p>
-                  <p className="text-sm text-amber-600">
-                    This Easter egg proves we build software with personality. Imagine what we can build for you.
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <h4 className="font-medium text-gray-700">System Status</h4>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="p-2 bg-green-50 rounded border border-green-200">
-                    <span className="text-green-600">● API: Healthy</span>
-                  </div>
-                  <div className="p-2 bg-green-50 rounded border border-green-200">
-                    <span className="text-green-600">● DB: Connected</span>
-                  </div>
-                  <div className="p-2 bg-green-50 rounded border border-green-200">
-                    <span className="text-green-600">● Cache: Active</span>
-                  </div>
-                  <div className="p-2 bg-blue-50 rounded border border-blue-200">
-                    <span className="text-blue-600">● Humans: Available</span>
-                  </div>
-                </div>
-              </div>
-
-              <p className="text-xs text-gray-500 text-center pt-2">
-                &quot;Enterprise software doesn&apos;t have to be boring.&quot; — ServiceVision
-              </p>
+              ))}
             </div>
           </div>
         </div>
-      )}
 
-      {/* Main Content */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar */}
-          <aside className="lg:w-64 shrink-0">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden sticky top-24">
-              {/* Search */}
-              <div className="p-4 border-b border-gray-100">
-                <div className="relative">
+        {/* Featured Article */}
+        <div className="bg-gradient-to-br from-emerald-500/10 to-purple-500/10 border border-emerald-500/20 rounded-xl p-6 mb-8">
+          <span className="text-xs font-medium text-emerald-400 uppercase tracking-wider">Featured</span>
+          <h2 className="text-2xl font-bold text-white mt-2 mb-3">What 40 Years of Computing Taught Us</h2>
+          <p className="text-gray-400 mb-4">
+            From mainframes to AI agents: the pattern of technological evolution that shaped ServiceVision.
+          </p>
+          <Link
+            href="/blog/what-40-years-of-computing-taught-us"
+            className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 font-medium"
+          >
+            Read Article
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </Link>
+        </div>
+
+        {/* Articles Grid */}
+        <div className="grid gap-4">
+          {filteredArticles.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              No articles found matching your criteria.
+            </div>
+          ) : (
+            filteredArticles.map((article) => (
+              <Link
+                key={article.id}
+                href={`/blog/${article.id}`}
+                className="group bg-[#111] border border-[#222] rounded-xl p-6 hover:border-emerald-500/30 transition-all"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <span className="text-xs font-medium text-emerald-500 uppercase tracking-wider">
+                      {article.category}
+                    </span>
+                    <h3 className="text-lg font-semibold text-white mt-1 mb-2 group-hover:text-emerald-400 transition-colors">
+                      {article.title}
+                    </h3>
+                    <p className="text-gray-400 text-sm mb-3">{article.excerpt}</p>
+                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <span>{article.author}</span>
+                      <span>{article.readTime}</span>
+                      <span>{article.date}</span>
+                    </div>
+                  </div>
                   <svg
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+                    className="w-5 h-5 text-gray-600 group-hover:text-emerald-400 transition-colors shrink-0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
+                    strokeWidth="2"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
-                  <input
-                    type="text"
-                    placeholder="Search resources..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  />
                 </div>
-                <p className="text-xs text-gray-400 mt-2">
-                  Try: &quot;cloud&quot;, &quot;ai&quot;, &quot;compliance&quot;
-                </p>
-              </div>
-
-              {/* Categories */}
-              <div className="p-4">
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                  Categories
-                </h3>
-                <nav className="space-y-1">
-                  {categories.map((category) => (
-                    <button
-                      key={category}
-                      onClick={() => setSelectedCategory(category)}
-                      className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${
-                        selectedCategory === category
-                          ? "bg-indigo-50 text-indigo-700 font-medium"
-                          : "text-gray-600 hover:bg-gray-50"
-                      }`}
-                    >
-                      {category}
-                      {category !== "All" && (
-                        <span className="float-right text-xs text-gray-400">
-                          {articles.filter((a) => a.category === category).length}
-                        </span>
-                      )}
-                    </button>
-                  ))}
-                </nav>
-              </div>
-
-              {/* Quick Stats */}
-              <div className="p-4 border-t border-gray-100 bg-gray-50">
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                  Library Stats
-                </h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Total Articles</span>
-                    <span className="font-medium text-gray-900">{articles.length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Categories</span>
-                    <span className="font-medium text-gray-900">{categories.length - 1}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Last Updated</span>
-                    <span className="font-medium text-emerald-600">Today</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </aside>
-
-          {/* Main Content Area */}
-          <main className="flex-1 min-w-0">
-            {/* Page Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Resource Library</h1>
-              <p className="text-gray-600">
-                Insights, guides, and best practices from our team. Built on 25 years of enterprise experience.
-              </p>
-            </div>
-
-            {/* Featured Article Banner */}
-            <div className="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-xl p-6 mb-6 text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-              <div className="relative">
-                <span className="inline-block px-2 py-1 bg-white/20 rounded text-xs font-medium mb-3">
-                  FEATURED ARTICLE
-                </span>
-                <h2 className="text-2xl font-bold mb-2">What 40 Years of Computing Taught Us</h2>
-                <p className="text-white/80 mb-4 max-w-lg">
-                  From mainframes to AI agents: the pattern of technological evolution that shaped ServiceVision.
-                  Why history matters for enterprise transformation.
-                </p>
-                <Link
-                  href="/blog/what-40-years-of-computing-taught-us"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-white text-emerald-700 rounded-lg font-medium hover:bg-white/90 transition-colors"
-                >
-                  Read Why History Matters
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
-              </div>
-            </div>
-
-            {/* Tool Banner */}
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 mb-8 text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-              <div className="relative">
-                <span className="inline-block px-2 py-1 bg-white/20 rounded text-xs font-medium mb-3">
-                  FREE TOOL
-                </span>
-                <h2 className="text-2xl font-bold mb-2">Markdown Editor</h2>
-                <p className="text-white/80 mb-4 max-w-lg">
-                  Our free, visual-first markdown editor. No account required. Drag, drop, and download.
-                  Inspired by Typora, built for the modern web.
-                </p>
-                <Link
-                  href="/md"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-white text-indigo-600 rounded-lg font-medium hover:bg-white/90 transition-colors"
-                >
-                  Try the Editor
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
-              </div>
-            </div>
-
-            {/* Articles Grid */}
-            <div className="grid gap-6">
-              {filteredArticles.length === 0 ? (
-                <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No articles found</h3>
-                  <p className="text-gray-500">Try adjusting your search or filter criteria.</p>
-                </div>
-              ) : (
-                filteredArticles.map((article) => (
-                  <article
-                    key={article.id}
-                    className="bg-white rounded-xl border border-gray-200 hover:border-indigo-200 hover:shadow-md transition-all group"
-                  >
-                    <div className="p-6">
-                      <div className="flex items-start justify-between gap-4 mb-4">
-                        <div>
-                          <span className="inline-block px-2 py-1 bg-indigo-50 text-indigo-600 rounded text-xs font-medium mb-2">
-                            {article.category}
-                          </span>
-                          <h2 className="text-xl font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
-                            <Link href={`/blog/${article.id}`}>{article.title}</Link>
-                          </h2>
-                        </div>
-                        <button className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-
-                      <p className="text-gray-600 mb-4">{article.excerpt}</p>
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                              />
-                            </svg>
-                            {article.author}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
-                            {article.readTime}
-                          </span>
-                          <span>{article.date}</span>
-                        </div>
-
-                        <div className="flex gap-2">
-                          {article.tags.slice(0, 2).map((tag) => (
-                            <span
-                              key={tag}
-                              className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </article>
-                ))
-              )}
-            </div>
-
-            {/* Bottom CTA */}
-            <div className="mt-12 bg-white rounded-xl border border-gray-200 p-8 text-center">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Want insights tailored to your project?
-              </h3>
-              <p className="text-gray-600 mb-6 max-w-lg mx-auto">
-                Our team has 25 years of enterprise experience. Let&apos;s talk about your specific challenges.
-              </p>
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
-              >
-                Start a Conversation
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
               </Link>
+            ))
+          )}
+        </div>
+
+        {/* Free Tool Banner */}
+        <div className="mt-8 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-xl p-6">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <span className="text-xs font-medium text-indigo-400 uppercase tracking-wider">Free Tool</span>
+              <h3 className="text-xl font-bold text-white mt-1">Markdown Editor</h3>
+              <p className="text-gray-400 text-sm mt-1">Visual-first markdown editing. No account required.</p>
             </div>
-          </main>
+            <Link
+              href="/md"
+              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-5 py-2.5 rounded-lg transition-colors"
+            >
+              Try Editor
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className="mt-8 text-center bg-[#111] border border-[#222] rounded-xl p-8">
+          <h3 className="text-xl font-semibold text-white mb-2">Want insights tailored to your project?</h3>
+          <p className="text-gray-400 mb-6">Our team has 25 years of enterprise experience.</p>
+          <Link
+            href="/contact"
+            className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-6 py-3 rounded-lg transition-colors"
+          >
+            Start a Conversation
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </Link>
         </div>
       </div>
+    </div>
+  );
+}
 
-      {/* Footer Attribution */}
-      <div className="border-t border-gray-200 bg-white py-4">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between text-sm text-gray-500">
-            <p>ServiceVision Resource Library &bull; Enterprise-grade insights, human-delivered.</p>
-            <p className="hidden sm:block">
-              <span className="text-emerald-600">●</span> 4hr response time &bull;{" "}
-              <span className="text-emerald-600">●</span> 24/7 availability
-            </p>
+// 2010s Mobile/Skeuomorphic Era Library
+function RetroLibrary({ articles, categories }: LibraryClientProps) {
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredArticles = articles.filter((article) => {
+    const matchesCategory = selectedCategory === "All" || article.category === selectedCategory;
+    const matchesSearch =
+      searchQuery === "" ||
+      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  return (
+    <div className="min-h-screen pt-20 pb-16" style={{ background: "linear-gradient(180deg, #1c1c1e 0%, #2c2c2e 100%)" }}>
+      {/* iOS-style Header Bar */}
+      <div className="sticky top-28 z-20 backdrop-blur-xl" style={{ background: "rgba(28, 28, 30, 0.95)" }}>
+        <div className="max-w-4xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-semibold text-white">Library</h1>
+            <div className="flex items-center gap-2">
+              <button className="p-2 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }}>
+                <svg className="w-5 h-5 text-[#0a84ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes slide-in {
-          from {
-            transform: translateX(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        {/* iOS-style Search Bar */}
+        <div className="mb-6">
+          <div className="relative">
+            <svg
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl text-white placeholder-gray-500 focus:outline-none"
+              style={{ background: "rgba(118, 118, 128, 0.24)" }}
+            />
+          </div>
+        </div>
 
-        @keyframes slide-up {
-          from {
-            transform: translateY(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateY(0);
-            opacity: 1;
-          }
-        }
+        {/* iOS-style Segmented Control */}
+        <div className="mb-6 p-1 rounded-lg overflow-x-auto" style={{ background: "rgba(118, 118, 128, 0.24)" }}>
+          <div className="flex gap-1 min-w-max">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
+                  selectedCategory === category
+                    ? "bg-[#3a3a3c] text-white shadow-sm"
+                    : "text-gray-400"
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
 
-        .animate-slide-in {
-          animation: slide-in 0.3s ease-out;
-        }
+        {/* Featured Card - iOS Style */}
+        <div className="mb-6 rounded-2xl overflow-hidden" style={{ background: "linear-gradient(135deg, #1c1c1e, #2c2c2e)", boxShadow: "0 4px 20px rgba(0,0,0,0.3)" }}>
+          <div className="p-5">
+            <div className="text-xs font-semibold text-[#0a84ff] uppercase tracking-wider mb-2">Featured</div>
+            <h2 className="text-xl font-bold text-white mb-2">What 40 Years of Computing Taught Us</h2>
+            <p className="text-gray-400 text-sm mb-4">From mainframes to AI agents: the evolution that shaped us.</p>
+            <Link
+              href="/blog/what-40-years-of-computing-taught-us"
+              className="inline-flex items-center text-[#0a84ff] text-sm font-medium"
+            >
+              Read More
+              <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+        </div>
 
-        .animate-slide-up {
-          animation: slide-up 0.3s ease-out;
-        }
-      `}</style>
+        {/* Articles List - iOS Table Style */}
+        <div className="rounded-2xl overflow-hidden" style={{ background: "#2c2c2e" }}>
+          {filteredArticles.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">
+              No articles found
+            </div>
+          ) : (
+            filteredArticles.map((article, index) => (
+              <Link
+                key={article.id}
+                href={`/blog/${article.id}`}
+                className="block"
+              >
+                <div
+                  className={`flex items-center gap-4 px-4 py-4 ${
+                    index < filteredArticles.length - 1 ? "border-b border-[#3a3a3c]" : ""
+                  }`}
+                >
+                  {/* App-like Icon */}
+                  <div
+                    className="w-14 h-14 rounded-xl flex items-center justify-center text-white text-lg font-bold shrink-0"
+                    style={{
+                      background: `linear-gradient(135deg, ${
+                        article.category === "AI" ? "#34c759, #30d158" :
+                        article.category === "Compliance" ? "#ff9500, #ff9f0a" :
+                        article.category === "Technical" ? "#0a84ff, #5e5ce6" :
+                        "#8e8e93, #636366"
+                      })`
+                    }}
+                  >
+                    {article.category.substring(0, 2).toUpperCase()}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-white font-medium truncate">{article.title}</h3>
+                    <p className="text-gray-500 text-sm truncate">{article.excerpt}</p>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-gray-600">
+                      <span>{article.readTime}</span>
+                      <span>•</span>
+                      <span>{article.date}</span>
+                    </div>
+                  </div>
+
+                  <svg className="w-5 h-5 text-gray-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </Link>
+            ))
+          )}
+        </div>
+
+        {/* Tool Card */}
+        <div className="mt-6 rounded-2xl p-5" style={{ background: "linear-gradient(135deg, #5e5ce6, #bf5af2)", boxShadow: "0 4px 20px rgba(94, 92, 230, 0.3)" }}>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-1">Free Tool</div>
+              <h3 className="text-lg font-bold text-white">Markdown Editor</h3>
+              <p className="text-white/70 text-sm">Visual-first editing</p>
+            </div>
+            <Link
+              href="/md"
+              className="bg-white text-[#5e5ce6] px-4 py-2 rounded-full font-semibold text-sm"
+            >
+              Open
+            </Link>
+          </div>
+        </div>
+
+        {/* Bottom CTA */}
+        <div className="mt-6 rounded-2xl p-6 text-center" style={{ background: "#2c2c2e" }}>
+          <h3 className="text-lg font-semibold text-white mb-2">Need Custom Insights?</h3>
+          <p className="text-gray-400 text-sm mb-4">25 years of enterprise experience at your service.</p>
+          <Link
+            href="/contact"
+            className="inline-block bg-[#0a84ff] text-white px-6 py-2.5 rounded-full font-semibold text-sm"
+          >
+            Contact Us
+          </Link>
+        </div>
+
+        {/* iOS-style Tab Bar Spacer */}
+        <div className="h-20"></div>
+      </div>
     </div>
+  );
+}
+
+export default function LibraryClient({ articles, categories }: LibraryClientProps) {
+  return (
+    <EraToggle beforeYear="2010" beforeLabel="Mobile/iOS Era" defaultModern={true}>
+      {{
+        before: <RetroLibrary articles={articles} categories={categories} />,
+        after: <ModernLibrary articles={articles} categories={categories} />,
+      }}
+    </EraToggle>
   );
 }

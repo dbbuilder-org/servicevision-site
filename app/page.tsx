@@ -44,52 +44,52 @@ const capabilities = [
 ];
 
 const stats = [
-  { label: "compliance_rate", value: "100%", desc: "Compliance Rate" },
-  { label: "response_time", value: "4hr", desc: "Response Time" },
-  { label: "support_model", value: "1:1", desc: "Dedicated Support" },
-  { label: "availability", value: "24/7", desc: "Always Available" },
+  { label: "years_in_business", value: "25", desc: "Years in Business" },
+  { label: "businesses_served", value: "3000+", desc: "Businesses Served" },
+  { label: "products_launched", value: "50+", desc: "Products Launched" },
+  { label: "saas_platforms", value: "20+", desc: "SaaS Platforms Built" },
 ];
 
 // Questions and their answers for the terminal and answer box
 const questionsAndAnswers = [
   {
-    q: "Where do I start?",
+    q: "Where do I start with AI?",
     a: "With a conversation. We'll listen to your challenges, understand your constraints, and give you an honest assessment—not a sales pitch."
   },
   {
-    q: "How do I meet compliance?",
-    a: "We build compliance in from day one. SOC 2, HIPAA, audit trails—we've done this for regulated industries and know what your auditors will ask."
+    q: "Can we deliver quickly and stay compliant?",
+    a: "Yes. We build compliance in from day one—SOC 2, HIPAA, audit trails. Speed and compliance aren't trade-offs when you plan for both."
   },
   {
-    q: "Who will own my project?",
-    a: "A named project lead who answers their phone. Not a rotating cast of contractors. Someone who knows your codebase and your business."
+    q: "Who is accountable when something goes wrong?",
+    a: "A named project lead who answers their phone. Not a rotating cast of contractors. Someone who knows your codebase and takes ownership."
   },
   {
-    q: "Can AI reduce my costs?",
-    a: "Yes, but we'll be honest about where. We identify high-impact automation opportunities and build ROI models you can defend to your board."
+    q: "Will AI deliver real business value?",
+    a: "We'll be honest about where it will and won't. We identify high-impact opportunities and build ROI models you can defend to your board."
   },
   {
-    q: "How do I scale securely?",
+    q: "How do we scale without compromising security?",
     a: "Architecture that grows with you. We design for your next stage, not just today's problems. Security reviews at every milestone."
   },
   {
-    q: "Who understands my industry?",
-    a: "25 years across healthcare, finance, logistics, and enterprise. We speak your domain language and know the regulations that keep you up at night."
+    q: "Who has done this in regulated industries?",
+    a: "We have. 25 years across healthcare, finance, logistics, and enterprise. We speak your domain language and know what your auditors will ask."
   },
   {
-    q: "Will this pass an audit?",
-    a: "We've been through dozens. Audit trails, explainable AI decisions, proper access controls—built in, not bolted on."
+    q: "Will this withstand due diligence?",
+    a: "We've been through dozens of audits. Explainable AI decisions, proper access controls, complete documentation—built in, not bolted on."
   },
   {
-    q: "Who answers when I call?",
-    a: "Your dedicated team lead. Direct line. 4-hour response SLA. We're not a help desk—we're your technical partners."
-  },
-  {
-    q: "Can I trust the AI output?",
+    q: "How do I verify the AI is accurate?",
     a: "Human-in-the-loop design for critical decisions. Confidence scores, uncertainty flags, and review workflows where they matter."
   },
   {
-    q: "Who treats this like theirs?",
+    q: "Who can I call for enterprise-level help?",
+    a: "Your dedicated team lead. Direct line. 4-hour response SLA. We're not a help desk—we're your technical partners."
+  },
+  {
+    q: "Who treats this project like their own?",
     a: "We do. No lock-in contracts because we earn your business monthly. Your success is our reputation."
   },
 ];
@@ -97,14 +97,17 @@ const questionsAndAnswers = [
 const terminalQuestions = questionsAndAnswers.map(qa => qa.q);
 
 // The "senior" question to land on - this is the one we want to emphasize
-const seniorQuestion = "Who treats this like theirs?";
+const seniorQuestion = "Who treats this project like their own?";
+
+// The opening question - always shown first
+const openingQuestion = "Who can I call for enterprise-level help?";
 
 // Dot matrix intro lines - printed bidirectionally like old printers
 const dotMatrixLines = [
-  "Your dedicated team of advisors, developers, engineers,",
-  "mentors, marketers, product managers, and consultants.",
-  "Twenty-five years of enterprise expertise meets cutting-edge AI.",
-  "Real value. No hype. Results you can audit.",
+  "Your dedicated team of Advisors, Developers, Engineers,",
+  "      Marketers, Testers, Product Managers, and Consultants.",
+  "         Decades of enterprise expertise meets cutting-edge AI.",
+  "            Real People x Extraordinary Tech = Measurable ROI.",
 ];
 
 // WarGames response pool - tractor-fed wisdom
@@ -170,13 +173,13 @@ export default function Home() {
   const [printingComplete, setPrintingComplete] = useState(false);
   const answersBoxRef = useRef<HTMLDivElement>(null);
 
-  // Set up questions: shuffle a few, then end with the senior question
+  // Set up questions: opening question first, shuffle middle, end with senior question
   useEffect(() => {
-    // Get random questions (excluding the senior one), take 3-4 of them
-    const otherQuestions = terminalQuestions.filter(q => q !== seniorQuestion);
-    const randomOthers = shuffleArray(otherQuestions).slice(0, 4);
-    // Add senior question at the end
-    setQuestions([...randomOthers, seniorQuestion]);
+    // Get random questions (excluding the opening and senior ones), take 3 of them
+    const otherQuestions = terminalQuestions.filter(q => q !== seniorQuestion && q !== openingQuestion);
+    const randomOthers = shuffleArray(otherQuestions).slice(0, 3);
+    // Build sequence: opening -> random middle -> senior
+    setQuestions([openingQuestion, ...randomOthers, seniorQuestion]);
     // Prevent auto-scroll - keep focus at top
     window.scrollTo(0, 0);
   }, []);
@@ -205,7 +208,7 @@ export default function Home() {
     return () => clearTimeout(startDelay);
   }, [showAnswers]);
 
-  // Dot matrix printer effect - bidirectional like real dot matrix
+  // Dot matrix printer effect - all lines left-to-right
   useEffect(() => {
     if (!isPrinting || currentLineIndex >= dotMatrixLines.length) {
       if (currentLineIndex >= dotMatrixLines.length && !printingComplete) {
@@ -216,20 +219,13 @@ export default function Home() {
     }
 
     const currentLine = dotMatrixLines[currentLineIndex];
-    const isReverseDirection = currentLineIndex % 2 === 1; // Odd lines print right-to-left
 
     if (currentCharIndex < currentLine.length) {
       const timeout = setTimeout(() => {
         setPrintedLines(prev => {
           const newLines = [...prev];
-          if (isReverseDirection) {
-            // Right to left: build string from the end
-            const charsToShow = currentCharIndex + 1;
-            newLines[currentLineIndex] = currentLine.slice(currentLine.length - charsToShow);
-          } else {
-            // Left to right: build string from the start
-            newLines[currentLineIndex] = currentLine.slice(0, currentCharIndex + 1);
-          }
+          // Left to right: build string from the start
+          newLines[currentLineIndex] = currentLine.slice(0, currentCharIndex + 1);
           return newLines;
         });
         setCurrentCharIndex(prev => prev + 1);
@@ -247,14 +243,14 @@ export default function Home() {
     }
   }, [isPrinting, currentLineIndex, currentCharIndex]);
 
-  // WarGames prompt - show 3 seconds after dot matrix printing completes
+  // WarGames prompt - show 10 seconds after dot matrix printing completes
   useEffect(() => {
     if (!printingComplete || gamePromptShown.current) return;
     gamePromptShown.current = true;
 
     const promptDelay = setTimeout(() => {
       setShowGamePrompt(true);
-    }, 3000);
+    }, 10000);
 
     return () => clearTimeout(promptDelay);
   }, [printingComplete]);
@@ -290,11 +286,49 @@ export default function Home() {
     }
   };
 
-  // Easter egg: Type "play" anywhere OR Alt+Y/Alt+N for game prompt OR arrow keys for Q&A
+  // Skip to answers when clicking the page (during question rotation)
+  const handleSkipToAnswers = (e: React.MouseEvent) => {
+    // Don't skip if clicking on interactive elements
+    const target = e.target as HTMLElement;
+    if (target.closest('a, button, input, textarea')) return;
+
+    // Only skip if we haven't landed on final yet
+    if (landedOnFinal) return;
+
+    // Jump to final question fully typed
+    setCurrentQuestion(questions.length - 1);
+    setDisplayedText(seniorQuestion);
+    setIsTyping(true);
+    setLandedOnFinal(true);
+
+    // Show answers immediately (the useEffect will handle printing)
+    if (!answersShown.current) {
+      answersShown.current = true;
+      setShowAnswers(true);
+    }
+  };
+
+  // Easter egg: Type "play" anywhere OR Alt+Y/Alt+N for game prompt OR arrow keys for Q&A OR Alt+S/P/L/A for GOTO
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't trigger if typing in an input
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      // Enter to skip question cycling and show answers
+      if (e.key === "Enter" && !landedOnFinal && questions.length > 0) {
+        e.preventDefault();
+        // Jump to final question fully typed
+        setCurrentQuestion(questions.length - 1);
+        setDisplayedText(seniorQuestion);
+        setIsTyping(true);
+        setLandedOnFinal(true);
+        // Show answers immediately
+        if (!answersShown.current) {
+          answersShown.current = true;
+          setShowAnswers(true);
+        }
         return;
       }
 
@@ -317,6 +351,24 @@ export default function Home() {
         e.preventDefault();
         handleGameNo();
         return;
+      }
+
+      // GOTO shortcuts: Alt+S, Alt+P, Alt+L, Alt+A
+      if (e.altKey) {
+        const key = e.key.toLowerCase();
+        if (key === "s") {
+          e.preventDefault();
+          window.location.href = "/services";
+        } else if (key === "p") {
+          e.preventDefault();
+          window.location.href = "/portfolio";
+        } else if (key === "l") {
+          e.preventDefault();
+          window.location.href = "/library";
+        } else if (key === "a") {
+          e.preventDefault();
+          window.location.href = "/ai";
+        }
       }
     };
 
@@ -368,17 +420,13 @@ export default function Home() {
         }
       }
     } else {
-      // Erasing mode
-      if (displayedText.length > 0) {
-        const timeout = setTimeout(() => {
-          setDisplayedText(displayedText.slice(0, -1));
-        }, 30);
-        return () => clearTimeout(timeout);
-      } else {
-        // Done erasing - move to next question
+      // Clear and move to next question instantly
+      const timeout = setTimeout(() => {
+        setDisplayedText("");
         setCurrentQuestion((prev) => prev + 1);
         setIsTyping(true);
-      }
+      }, 300); // Brief pause before clearing
+      return () => clearTimeout(timeout);
     }
   }, [displayedText, isTyping, currentQuestion, questions]);
 
@@ -390,7 +438,10 @@ export default function Home() {
       )}
 
       {/* Hero Section - Terminal Style */}
-      <section className="relative min-h-screen flex items-center">
+      <section
+        className={`relative min-h-screen flex flex-col ${!landedOnFinal ? 'cursor-pointer' : ''}`}
+        onClick={handleSkipToAnswers}
+      >
         {/* Subtle grid background */}
         <div className="absolute inset-0 bg-terminal-grid opacity-50" />
 
@@ -398,7 +449,8 @@ export default function Home() {
         <div className="absolute top-20 right-20 w-[400px] h-[400px] bg-emerald-500/5 rounded-full blur-[100px]" />
         <div className="absolute bottom-20 left-20 w-[300px] h-[300px] bg-amber-500/5 rounded-full blur-[100px]" />
 
-        <div className="relative mx-auto max-w-7xl px-6 py-32 lg:px-8 w-full">
+        {/* Main content area - grows to fill space */}
+        <div className="relative flex-1 flex items-center mx-auto max-w-7xl px-6 pt-24 pb-8 lg:px-8 w-full">
           <div className="max-w-4xl">
             {/* Part 1: "You have the questions..." */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-8">
@@ -406,7 +458,7 @@ export default function Home() {
             </h1>
 
             {/* Terminal Window - Shows rotating questions */}
-            <div className="terminal-window animate-terminal-glow mb-8">
+            <div className="terminal-window animate-terminal-glow mb-4">
               <div className="terminal-header">
                 <span className="text-xs text-emerald-400 font-mono">SERVICEVISION</span>
                 <span className="text-xs text-gray-600 font-mono ml-auto">v1.0</span>
@@ -414,28 +466,39 @@ export default function Home() {
 
               <div className="terminal-body">
                 <div className="flex items-start gap-2">
-                  <span className="phosphor-text text-2xl sm:text-3xl lg:text-4xl font-bold font-mono">&gt;</span>
-                  <span className="phosphor-text text-2xl sm:text-3xl lg:text-4xl font-bold font-mono whitespace-nowrap">
+                  <span className="phosphor-text text-xl sm:text-2xl lg:text-3xl font-bold font-mono">&gt;</span>
+                  <span className="phosphor-text text-xl sm:text-2xl lg:text-3xl font-bold font-mono whitespace-nowrap">
                     {displayedText}
-                    <span className="inline-block w-3 sm:w-4 h-7 sm:h-9 bg-emerald-400 ml-1 animate-blink" />
+                    <span className={`inline-block w-2.5 sm:w-3 h-6 sm:h-7 bg-emerald-400 ml-1 ${showAnswers ? '' : 'animate-blink'}`} />
                   </span>
                 </div>
               </div>
             </div>
 
+            {/* Click hint - only show while cycling questions */}
+            {!landedOnFinal && (
+              <div className="text-center mb-12">
+                <span className="text-gray-500 text-sm font-mono animate-pulse">Click for answers</span>
+              </div>
+            )}
+
+            {landedOnFinal && !showAnswers && <div className="mb-12" />}
+
             {/* Part 2: "We have the answers." - revealed after landing on final question */}
             {showAnswers && (
-              <>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-8 animate-fade-in">
-                  We have the answers.
-                </h2>
+              <div className="flex justify-end -mr-16 lg:-mr-32 xl:-mr-48">
+                <div className="max-w-2xl w-full">
+                  <div className="mt-8 mb-10" />
+                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-8 animate-fade-in">
+                    We have the answers.
+                  </h2>
 
-                {/* Answer Box with Dot Matrix Intro + Scrollable Q&A */}
-                <div className="bg-[#111] border border-[#333] rounded-lg p-6 mb-10 font-mono">
-                  {/* Dot Matrix Intro - printed bidirectionally, only show lines that have content */}
+                  {/* Answer Box with Dot Matrix Intro + Scrollable Q&A */}
+                  <div className="bg-[#111] border border-[#333] rounded-lg p-6 mb-10 font-mono">
+                  {/* Dot Matrix Intro - first 2 lines left, last 2 lines right */}
                   <div className="space-y-1">
                     {dotMatrixLines.map((line, index) => {
-                      const isReverse = index % 2 === 1;
+                      const isRightJustified = index >= 2; // Lines 2 and 3 (0-indexed) are right justified
                       const displayedLine = printedLines[index] || "";
                       const isCurrentLine = index === currentLineIndex && isPrinting;
                       const isComplete = index < currentLineIndex || (index === currentLineIndex && currentCharIndex >= line.length);
@@ -447,7 +510,7 @@ export default function Home() {
                         <div
                           key={index}
                           className={`text-sm leading-relaxed tracking-wide ${
-                            isReverse ? "text-right" : "text-left"
+                            isRightJustified ? "text-right" : "text-left"
                           }`}
                         >
                           <span className={`${isComplete ? "text-amber-300" : "text-amber-400"}`}>
@@ -463,16 +526,16 @@ export default function Home() {
 
                   {/* Reveal prompt - shows after printing completes, before Q&A revealed */}
                   {printingComplete && !showQASection && (
-                    <div className="flex flex-col items-center pt-4 mt-4 border-t border-[#333]">
+                    <div className="flex items-center justify-center gap-4 pt-4 mt-4 border-t border-[#333]">
                       <button
                         onClick={revealAndScrollQA}
                         className="flex items-center gap-3 text-amber-400 hover:text-amber-300 text-sm font-mono cursor-pointer transition-colors group"
                       >
                         <span className="text-lg animate-bounce">↓</span>
-                        <span className="border-b border-dashed border-amber-400/50 group-hover:border-amber-300">Read More Answers</span>
+                        <span className="border-b border-dashed border-amber-400/50 group-hover:border-amber-300">Scroll for more answers</span>
                         <span className="text-lg animate-bounce">↓</span>
                       </button>
-                      <span className="text-gray-600 text-xs mt-2">Press ↓ or Space</span>
+                      <span className="text-gray-600 text-xs">↓ or Space</span>
                     </div>
                   )}
 
@@ -521,124 +584,81 @@ export default function Home() {
                       </div>
                     </div>
                   )}
-                </div>
-
-                {/* WarGames "Do you want to play a game?" prompt */}
-                {showGamePrompt && (
-                  <div className="bg-[#111] border border-[#333] rounded-lg p-6 font-mono">
-                    {/* Tractor feed paper - scrollable message history */}
-                    {gamePromptMessages.length > 0 && (
-                      <div
-                        ref={tractorFeedRef}
-                        className="max-h-32 overflow-y-auto mb-4 scroll-smooth"
-                        style={{
-                          backgroundImage: `repeating-linear-gradient(
-                            transparent,
-                            transparent 23px,
-                            rgba(251, 191, 36, 0.05) 23px,
-                            rgba(251, 191, 36, 0.05) 24px
-                          )`,
-                          backgroundSize: '100% 24px',
-                        }}
-                      >
-                        {/* Tractor feed holes decoration */}
-                        <div className="relative">
-                          <div className="absolute left-0 top-0 bottom-0 w-4 flex flex-col justify-start gap-[18px] pt-1 opacity-30">
-                            {gamePromptMessages.map((_, idx) => (
-                              <div key={idx} className="w-2 h-2 rounded-full border border-amber-600" />
-                            ))}
-                          </div>
-                          <div className="absolute right-0 top-0 bottom-0 w-4 flex flex-col justify-start gap-[18px] pt-1 opacity-30">
-                            {gamePromptMessages.map((_, idx) => (
-                              <div key={idx} className="w-2 h-2 rounded-full border border-amber-600" />
-                            ))}
-                          </div>
-
-                          {/* Messages */}
-                          <div className="px-6 py-2 space-y-2">
-                            {gamePromptMessages.map((msg, idx) => (
-                              <div key={idx} className="text-amber-400/90 text-sm leading-6">
-                                <span className="text-gray-600 text-xs mr-2">[{String(idx + 1).padStart(2, '0')}]</span>
-                                {msg}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* The question */}
-                    <div className="text-amber-400 text-sm sm:text-base mb-3">
-                      <span className="text-gray-500">WOPR&gt; </span>
-                      Do you want to play a game?
-                      {gamePromptMessages.length > 0 && (
-                        <span className="text-gray-600 text-xs ml-2">
-                          (attempt #{gamePromptMessages.length + 1})
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Yes/No options */}
-                    <div className="flex items-center gap-6 text-sm sm:text-base">
-                      <button
-                        onClick={handleGameYes}
-                        className="text-amber-400 hover:text-amber-300 hover:bg-amber-400/10 px-3 py-1 rounded transition-colors group"
-                      >
-                        [<span className="underline group-hover:font-bold">Y</span>]es
-                      </button>
-                      <button
-                        onClick={handleGameNo}
-                        className="text-amber-400 hover:text-amber-300 hover:bg-amber-400/10 px-3 py-1 rounded transition-colors group"
-                      >
-                        [<span className="underline group-hover:font-bold">N</span>]o
-                      </button>
-                      <span className="text-gray-600 text-xs ml-auto hidden sm:inline">
-                        Alt+Y / Alt+N
-                      </span>
-                    </div>
                   </div>
-                )}
-              </>
+
+                  {/* Get to know us section - below the answers terminal, stair-stepped right */}
+                  {printingComplete && (
+                    <div className="mt-12 mb-8 ml-auto -mr-12 lg:-mr-24 xl:-mr-32 max-w-md">
+                      <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-8">Get to know us.</h3>
+                      <div className="bg-[#111] border border-[#333] rounded-lg px-4 py-3 font-mono text-sm space-y-3">
+                        <div>
+                          <span className="text-gray-500">GOTO:</span>{" "}
+                          <Link
+                            href="/services"
+                            className="text-emerald-400 hover:text-amber-400 transition-colors"
+                          >
+                            <span className="underline">S</span>ervices
+                          </Link>{" "}
+                          <Link
+                            href="/portfolio"
+                            className="text-emerald-400 hover:text-amber-400 transition-colors"
+                          >
+                            <span className="underline">P</span>ortfolio
+                          </Link>{" "}
+                          <Link
+                            href="/library"
+                            className="text-emerald-400 hover:text-amber-400 transition-colors"
+                          >
+                            <span className="underline">L</span>ibrary
+                          </Link>{" "}
+                          <Link
+                            href="/ai"
+                            className="text-purple-400 hover:text-purple-300 transition-colors"
+                          >
+                            <span className="underline">A</span>I
+                          </Link>
+                        </div>
+
+                        {/* Do you want to play a game? */}
+                        {showGamePrompt && (
+                          <div>
+                            <span className="text-gray-500">WOPR&gt;</span>{" "}
+                            <span className="text-amber-400">Do you want to play a game?</span>{" "}
+                            <button
+                              onClick={handleGameYes}
+                              className="text-amber-400 hover:text-amber-300 transition-colors"
+                            >
+                              [<span className="underline">Y</span>]es
+                            </button>{" "}
+                            <button
+                              onClick={handleGameNo}
+                              className="text-amber-400 hover:text-amber-300 transition-colors"
+                            >
+                              [<span className="underline">N</span>]o
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
 
-            {/* CTA Section */}
-            <div>
-              <div className="font-mono mb-6">
-                <span className="text-gray-500">$ </span>
-                <span className="text-emerald-400">servicevision</span>
-                <span className="text-gray-500"> --start</span>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-4">
-                <Link
-                  href="/contact"
-                  className="btn-retro rounded-lg"
-                >
-                  Start Conversation
-                </Link>
-                <Link
-                  href="/services"
-                  className="btn-retro btn-retro-amber rounded-lg"
-                >
-                  View Services
-                </Link>
-              </div>
-            </div>
           </div>
         </div>
-      </section>
 
-      {/* Stats Section */}
-      <section className="relative py-8 border-y border-[#2a2a2a]">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
-            {stats.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="font-mono text-xs text-gray-500 mb-2">{stat.label}:</div>
-                <div className="text-3xl font-bold phosphor-text font-mono">{stat.value}</div>
-                <div className="text-sm text-gray-400 mt-1">{stat.desc}</div>
-              </div>
-            ))}
+        {/* Stats - visible on initial load, pushes down as content expands */}
+        <div className="relative py-8 border-t border-[#2a2a2a] mb-12">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
+              {stats.map((stat) => (
+                <div key={stat.label} className="text-center">
+                  <div className="text-3xl font-bold phosphor-text font-mono">{stat.value}</div>
+                  <div className="text-sm text-gray-400 mt-1">{stat.desc}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -754,7 +774,7 @@ export default function Home() {
             </div>
             <div className="p-8 sm:p-12">
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full border-2 border-emerald-400 mb-6">
-                <span className="text-2xl font-bold phosphor-text font-mono">25%</span>
+                <span className="text-2xl font-bold phosphor-text font-mono">10%</span>
               </div>
 
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
@@ -762,7 +782,7 @@ export default function Home() {
               </h2>
 
               <p className="text-gray-400 leading-relaxed mb-6 max-w-xl mx-auto">
-                We donate <span className="text-emerald-400 font-semibold">25% of our profits</span> to
+                We donate <span className="text-emerald-400 font-semibold">10% of our profits</span> to
                 organizations using technology to make a positive impact.
               </p>
 

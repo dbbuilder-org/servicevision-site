@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import EraToggle from "@/components/EraToggle";
 
 const featuredProjects = [
   {
@@ -67,18 +68,164 @@ const ndaProjects = [
   },
 ];
 
-export default function PortfolioPage() {
+// Modern Portfolio UI
+function ModernPortfolio() {
+  const [activeProject, setActiveProject] = useState<string | null>(null);
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-20">
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Our Portfolio
+          </h1>
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+            25 years of delivering enterprise solutions. From startups to Fortune 500,
+            we build software that works.
+          </p>
+        </div>
+
+        {/* Stats Bar */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+          {[
+            { label: "Years Experience", value: "25+" },
+            { label: "Projects Completed", value: "150+" },
+            { label: "Client Satisfaction", value: "98%" },
+            { label: "Profit to Charity", value: "25%" },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="bg-[#111] border border-[#222] rounded-lg p-4 text-center"
+            >
+              <div className="text-2xl font-bold text-emerald-400">{stat.value}</div>
+              <div className="text-xs text-gray-500 mt-1">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Featured Projects */}
+        <div className="mb-12">
+          <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+            <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
+            Featured Projects
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {featuredProjects.map((project) => (
+              <a
+                key={project.name}
+                href={project.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group bg-[#111] border border-[#222] rounded-xl p-6 hover:border-emerald-500/30 transition-all duration-300"
+              >
+                {/* Project Icon */}
+                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 rounded-lg flex items-center justify-center text-emerald-400 font-bold text-lg mb-4 group-hover:from-emerald-500/30 group-hover:to-emerald-600/30 transition-colors">
+                  {project.name.substring(0, 2).toUpperCase()}
+                </div>
+
+                {/* Project Info */}
+                <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-emerald-400 transition-colors">
+                  {project.name}
+                </h3>
+                <p className="text-sm text-gray-400 mb-4 line-clamp-2">
+                  {project.description}
+                </p>
+
+                {/* Tech Tags */}
+                <div className="flex flex-wrap gap-2">
+                  {project.tech.map((t) => (
+                    <span
+                      key={t}
+                      className="text-xs px-2 py-1 bg-[#1a1a1a] text-gray-400 rounded"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Arrow */}
+                <div className="mt-4 flex items-center text-sm text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                  Visit Site
+                  <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* NDA Projects */}
+        <div className="mb-12">
+          <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+            <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+            Enterprise Projects (NDA)
+          </h2>
+          <div className="bg-[#111] border border-[#222] rounded-xl overflow-hidden">
+            <div className="p-4 bg-purple-500/5 border-b border-[#222]">
+              <p className="text-sm text-gray-400">
+                Details available during consultation. These represent a sample of our enterprise work.
+              </p>
+            </div>
+            <div className="divide-y divide-[#222]">
+              {ndaProjects.map((project) => (
+                <div
+                  key={project.id}
+                  className="p-4 hover:bg-[#1a1a1a] transition-colors cursor-pointer"
+                  onClick={() => setActiveProject(activeProject === project.id ? null : project.id)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center">
+                        <svg className="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div className="font-medium text-white">
+                          {project.industry} - {project.type}
+                        </div>
+                        <div className="text-sm text-gray-500">{project.description}</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-medium text-emerald-400">{project.outcome}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className="text-center bg-gradient-to-r from-purple-500/10 via-emerald-500/5 to-purple-500/10 border border-purple-500/20 rounded-xl p-8">
+          <h2 className="text-2xl font-bold text-white mb-2">Want to See More?</h2>
+          <p className="text-gray-400 mb-6">
+            Schedule a call to discuss detailed case studies and how we can help with your project.
+          </p>
+          <Link
+            href="/contact"
+            className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-6 py-3 rounded-lg transition-colors"
+          >
+            Request Case Studies
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// MySpace/Dot-com Era Portfolio
+function RetroPortfolio() {
   const [selectedProject, setSelectedProject] = useState(0);
 
   return (
     <div className="dotcom-page pt-20 pb-12">
-      {/* Marquee Banner */}
-      <div className="bg-[#000033] text-[#00ff00] py-2 overflow-hidden border-y border-[#336699]">
-        <div className="dotcom-marquee whitespace-nowrap font-mono text-sm">
-          ★ ★ ★ Welcome to ServiceVision&apos;s Portfolio! ★ ★ ★ Check out our latest projects! ★ ★ ★ We&apos;ve helped 100+ companies build amazing software! ★ ★ ★ Thanks for visiting! ★ ★ ★
-        </div>
-      </div>
-
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Profile Header */}
         <div className="dotcom-profile-box mb-6">
@@ -210,17 +357,17 @@ export default function PortfolioPage() {
             {/* NDA Projects as "Private Albums" */}
             <div className="dotcom-profile-box">
               <div className="dotcom-header">
-                🔒 Private Projects (NDA Protected)
+                Private Projects (NDA Protected)
               </div>
               <div className="dotcom-content">
                 <div className="dotcom-blurb mb-4">
                   <strong>Note:</strong> These projects are under NDA. Details available during consultation. Click &quot;Request Access&quot; to learn more!
                 </div>
                 <div className="space-y-3">
-                  {ndaProjects.map((project, index) => (
+                  {ndaProjects.map((project) => (
                     <div key={project.id} className="flex items-center gap-3 p-2 border border-[#dddddd] hover:bg-[#f8f8f8]">
                       <div className="w-10 h-10 bg-[#999999] flex items-center justify-center text-white text-[10px] font-bold">
-                        🔒
+                        NDA
                       </div>
                       <div className="flex-1">
                         <div className="font-bold text-[11px] text-[#003366]">
@@ -246,7 +393,7 @@ export default function PortfolioPage() {
             {/* Contact Widget */}
             <div className="dotcom-profile-box">
               <div className="dotcom-header">
-                📧 Contact ServiceVision
+                Contact ServiceVision
               </div>
               <div className="dotcom-content text-center">
                 <div className="mb-3">
@@ -267,7 +414,7 @@ export default function PortfolioPage() {
             {/* Stats Widget */}
             <div className="dotcom-profile-box">
               <div className="dotcom-header">
-                📊 Our Stats
+                Our Stats
               </div>
               <div className="dotcom-content">
                 <div className="space-y-2 text-[11px]">
@@ -298,7 +445,7 @@ export default function PortfolioPage() {
             {/* Guestbook Widget */}
             <div className="dotcom-profile-box">
               <div className="dotcom-header">
-                📝 Guestbook
+                Guestbook
               </div>
               <div className="dotcom-content">
                 <div className="space-y-3 text-[10px]">
@@ -324,7 +471,7 @@ export default function PortfolioPage() {
             {/* Web Ring */}
             <div className="dotcom-profile-box">
               <div className="dotcom-header">
-                🔗 ServiceVision Web Ring
+                ServiceVision Web Ring
               </div>
               <div className="dotcom-content text-center text-[10px]">
                 <div className="flex justify-center gap-4 mb-2">
@@ -358,5 +505,17 @@ export default function PortfolioPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Main Page Component with Era Toggle
+export default function PortfolioPage() {
+  return (
+    <EraToggle beforeYear="2000" beforeLabel="Dot-Com Era" defaultModern={true}>
+      {{
+        before: <RetroPortfolio />,
+        after: <ModernPortfolio />,
+      }}
+    </EraToggle>
   );
 }

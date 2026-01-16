@@ -125,7 +125,7 @@ export default function Header() {
           <div className="flex lg:flex-1">
             <Link href="/" className="group flex items-center gap-1">
               <span className="font-mono font-bold text-white group-hover:text-purple-400 transition-colors">
-                <span className="text-purple-400">&gt;</span>SERVICE<span className="text-purple-400">\</span>VISION
+                <span className="text-purple-400">&gt;</span>SERVICE<span className="text-purple-400">*</span>VISION
               </span>
               {shouldBlink && <span className="hidden sm:inline-block w-2 h-5 bg-purple-400 animate-blink" />}
             </Link>
@@ -172,7 +172,11 @@ export default function Header() {
           <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center lg:gap-3">
             <Link
               href="/ai"
-              className="px-4 py-2 text-sm font-medium rounded-md border border-purple-500 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300 transition-colors"
+              className={`px-4 py-2 text-sm font-medium rounded-md border border-purple-500 transition-colors ${
+                pathname === "/ai"
+                  ? "bg-purple-500 text-white"
+                  : "text-purple-400 hover:bg-purple-500/10 hover:text-purple-300"
+              }`}
             >
               AI
             </Link>
@@ -186,7 +190,11 @@ export default function Header() {
             </button>
             <Link
               href="/contact"
-              className="btn-retro rounded-md text-sm px-4 py-2"
+              className={`rounded-md text-sm px-4 py-2 font-medium border transition-colors ${
+                pathname === "/contact"
+                  ? "bg-emerald-500 border-emerald-500 text-white"
+                  : "btn-retro"
+              }`}
             >
               Contact
             </Link>
@@ -221,7 +229,11 @@ export default function Header() {
             <div className="pt-4 px-4 flex flex-col gap-3">
               <Link
                 href="/ai"
-                className="text-center px-4 py-3 text-sm font-medium rounded-md border border-purple-500 text-purple-400 hover:bg-purple-500/10 transition-colors"
+                className={`text-center px-4 py-3 text-sm font-medium rounded-md border border-purple-500 transition-colors ${
+                  pathname === "/ai"
+                    ? "bg-purple-500 text-white"
+                    : "text-purple-400 hover:bg-purple-500/10"
+                }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 AI
@@ -239,7 +251,11 @@ export default function Header() {
                 </button>
                 <Link
                   href="/contact"
-                  className="btn-retro rounded-md text-sm px-4 py-3 flex-1 text-center"
+                  className={`rounded-md text-sm px-4 py-3 flex-1 text-center font-medium border transition-colors ${
+                    pathname === "/contact"
+                      ? "bg-emerald-500 border-emerald-500 text-white"
+                      : "btn-retro"
+                  }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Contact
