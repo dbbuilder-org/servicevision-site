@@ -13,14 +13,17 @@ import {
 interface ContactEmailProps {
   name: string;
   email: string;
+  phone?: string;
+  company?: string;
+  subject?: string;
   message: string;
 }
 
-export default function ContactEmail({ name, email, message }: ContactEmailProps) {
+export default function ContactEmail({ name, email, phone, company, subject, message }: ContactEmailProps) {
   return (
     <Html>
       <Head />
-      <Preview>New contact form submission from {name}</Preview>
+      <Preview>New contact form submission from {name}{company ? ` at ${company}` : ""}</Preview>
       <Body style={main}>
         <Container style={container}>
           <Heading style={heading}>New Contact Form Submission</Heading>
@@ -35,6 +38,27 @@ export default function ContactEmail({ name, email, message }: ContactEmailProps
             <Text style={label}>Email</Text>
             <Text style={value}>{email}</Text>
 
+            {phone && (
+              <>
+                <Text style={label}>Phone</Text>
+                <Text style={value}>{phone}</Text>
+              </>
+            )}
+
+            {company && (
+              <>
+                <Text style={label}>Company</Text>
+                <Text style={value}>{company}</Text>
+              </>
+            )}
+
+            {subject && (
+              <>
+                <Text style={label}>Subject</Text>
+                <Text style={value}>{subject}</Text>
+              </>
+            )}
+
             <Text style={label}>Message</Text>
             <Text style={messageText}>{message}</Text>
           </Section>
@@ -42,7 +66,7 @@ export default function ContactEmail({ name, email, message }: ContactEmailProps
           <Hr style={hr} />
 
           <Text style={footer}>
-            This email was sent from the contact form at servicevision.net
+            This email was sent from the contact form at servicevision.io
           </Text>
         </Container>
       </Body>

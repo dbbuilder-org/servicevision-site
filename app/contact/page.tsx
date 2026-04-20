@@ -12,6 +12,8 @@ function ModernContact() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
+    company: "",
     subject: "",
     message: "",
   });
@@ -42,7 +44,10 @@ function ModernContact() {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          message: `Subject: ${formData.subject}\n\n${formData.message}`,
+          phone: formData.phone,
+          company: formData.company,
+          subject: formData.subject,
+          message: formData.message,
           recaptchaToken: recaptchaToken || "",
         }),
       });
@@ -51,7 +56,7 @@ function ModernContact() {
       if (!response.ok) throw new Error(data.error || "Something went wrong");
 
       setStatus("success");
-      setFormData({ name: "", email: "", subject: "", message: "" });
+      setFormData({ name: "", email: "", phone: "", company: "", subject: "", message: "" });
       setRecaptchaToken(null);
       recaptchaRef.current?.reset();
     } catch (error) {
@@ -98,7 +103,7 @@ function ModernContact() {
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1">To</label>
                 <div className="px-3 py-2 bg-[#0a0a0a] border border-[#333] rounded text-emerald-400 font-mono text-sm">
-                  info@servicevision.net
+                  info@servicevision.io
                 </div>
               </div>
 
@@ -123,6 +128,30 @@ function ModernContact() {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="jane@company.com"
+                    className="w-full px-3 py-2 bg-[#0a0a0a] border border-[#333] rounded text-white text-sm placeholder-gray-600 focus:border-emerald-500 focus:outline-none transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Phone & Company row */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Phone</label>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="+1 (555) 000-0000"
+                    className="w-full px-3 py-2 bg-[#0a0a0a] border border-[#333] rounded text-white text-sm placeholder-gray-600 focus:border-emerald-500 focus:outline-none transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Company</label>
+                  <input
+                    type="text"
+                    value={formData.company}
+                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                    placeholder="Acme Corp"
                     className="w-full px-3 py-2 bg-[#0a0a0a] border border-[#333] rounded text-white text-sm placeholder-gray-600 focus:border-emerald-500 focus:outline-none transition-colors"
                   />
                 </div>
@@ -188,10 +217,10 @@ function ModernContact() {
         <div className="mt-8 pt-6 border-t border-[#333] text-center">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-gray-400">
             <a
-              href="mailto:info@servicevision.net"
+              href="mailto:info@servicevision.io"
               className="hover:text-emerald-400 transition-colors"
             >
-              info@servicevision.net
+              info@servicevision.io
             </a>
             <span className="hidden sm:inline text-gray-600">•</span>
             <span>Seattle, WA</span>
@@ -209,6 +238,8 @@ function RetroContact() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
+    company: "",
     subject: "",
     message: "",
   });
@@ -228,7 +259,10 @@ function RetroContact() {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          message: `Subject: ${formData.subject}\n\n${formData.message}`,
+          phone: formData.phone,
+          company: formData.company,
+          subject: formData.subject,
+          message: formData.message,
           recaptchaToken: "",
         }),
       });
@@ -237,7 +271,7 @@ function RetroContact() {
       if (!response.ok) throw new Error(data.error || "Something went wrong");
 
       setStatus("success");
-      setFormData({ name: "", email: "", subject: "", message: "" });
+      setFormData({ name: "", email: "", phone: "", company: "", subject: "", message: "" });
     } catch (error) {
       setStatus("error");
       setErrorMessage(error instanceof Error ? error.message : "Something went wrong");
@@ -343,7 +377,7 @@ function RetroContact() {
                   <div className="flex items-center gap-2">
                     <label className="w-16 text-right text-xs font-bold text-[#000080]">To:</label>
                     <div className="flex-1 bg-[#e8e8e8] border border-[#808080] px-2 py-1 text-sm text-[#000080]">
-                      info@servicevision.net
+                      info@servicevision.io
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -365,6 +399,26 @@ function RetroContact() {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Your Name"
+                      className="flex-1 border border-[#808080] px-2 py-1 text-sm focus:outline-none focus:border-[#000080]"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="w-16 text-right text-xs font-bold text-[#000080]">Phone:</label>
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      placeholder="+1 (555) 000-0000"
+                      className="flex-1 border border-[#808080] px-2 py-1 text-sm focus:outline-none focus:border-[#000080]"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="w-16 text-right text-xs font-bold text-[#000080]">Company:</label>
+                    <input
+                      type="text"
+                      value={formData.company}
+                      onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                      placeholder="Your Company"
                       className="flex-1 border border-[#808080] px-2 py-1 text-sm focus:outline-none focus:border-[#000080]"
                     />
                   </div>

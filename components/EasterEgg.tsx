@@ -11,7 +11,7 @@ export default function EasterEgg() {
 
     You found our easter egg! We love people who dig into source code.
 
-    We'd love to hear from you! Write us at info@servicevision.net and tell us:
+    We'd love to hear from you! Write us at info@servicevision.io and tell us:
 
     • What brought you here?
     • What do you find interesting, good, bad, or improvable about our site?

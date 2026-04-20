@@ -41,15 +41,41 @@ export default function Footer() {
       {/* Gradient separator */}
       <div className="h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
       <div className="h-16 bg-gradient-to-b from-purple-900/20 to-transparent" />
-      <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+
+      {/* ===== MOBILE FOOTER (< md) ===== */}
+      <div className="md:hidden px-6 py-8">
+        <Link href="/contact" className="block text-center group">
+          <div className="inline-flex items-center gap-2 mb-4">
+            <span className="text-emerald-400 font-mono text-lg">&gt;</span>
+            <span className="font-bold text-white text-xl group-hover:text-emerald-400 transition-colors">
+              ServiceVision
+            </span>
+          </div>
+          <p className="text-sm text-gray-400 leading-relaxed mb-4">
+            AI-powered software development with the high-touch, compliance-first service you deserve.
+          </p>
+          <span className="inline-flex items-center gap-2 text-emerald-400 text-sm font-medium">
+            <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+            Get in touch →
+          </span>
+        </Link>
+        <div className="mt-6 pt-4 border-t border-[#2a2a2a] text-center">
+          <p className="text-xs text-gray-600 font-mono">
+            &copy; {new Date().getFullYear()} ServiceVision
+          </p>
+        </div>
+      </div>
+
+      {/* ===== DESKTOP FOOTER (md+) ===== */}
+      <div className="hidden md:block mx-auto max-w-7xl px-6 py-16 lg:px-8">
         {/* Terminal-style header */}
         <div className="font-mono text-sm text-gray-500 mb-12">
           <span className="text-emerald-400">$</span> cat footer.txt
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div className="grid grid-cols-4 gap-12">
           {/* Brand column */}
-          <div className="md:col-span-2">
+          <div className="col-span-2">
             <Link href="/" className="inline-flex items-center gap-2 group">
               <span className="text-emerald-400 font-mono text-lg">&gt;</span>
               <span className="font-bold text-white text-xl group-hover:text-emerald-400 transition-colors">
@@ -116,10 +142,10 @@ export default function Footer() {
                 ./contact
               </h3>
               <a
-                href="mailto:info@servicevision.net"
+                href="mailto:info@servicevision.io"
                 className="text-sm text-gray-400 hover:text-emerald-400 transition-colors font-mono"
               >
-                info@servicevision.net
+                info@servicevision.io
               </a>
             </div>
 
@@ -142,19 +168,19 @@ export default function Footer() {
 
         {/* Bottom section */}
         <div className="mt-16 pt-8 border-t border-[#2a2a2a]">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex flex-row items-center justify-between gap-4">
             <p className="text-sm text-gray-500 font-mono">
               &copy; {new Date().getFullYear()} ServiceVision. All rights reserved.
             </p>
             <div className="flex items-center gap-2 text-sm text-gray-500 font-mono">
               <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-              <span>25% of profits donated to tech-for-good orgs</span>
+              <span>10% of profits donated to tech-for-good orgs</span>
             </div>
           </div>
         </div>
 
         {/* ASCII art decoration */}
-        <div className="mt-8 text-center font-mono text-[10px] text-gray-700 leading-none hidden md:block">
+        <div className="mt-8 text-center font-mono text-[10px] text-gray-700 leading-none">
           <pre>{`
     ╔══════════════════════════════════════════════════════╗
     ║  Built with care. Powered by AI. Guided by humans.  ║

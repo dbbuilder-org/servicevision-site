@@ -30,7 +30,7 @@ async function verifyRecaptcha(token: string): Promise<boolean> {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, message, recaptchaToken } = body;
+    const { name, email, phone, company, subject, message, recaptchaToken } = body;
 
     if (!name || !email || !message) {
       return NextResponse.json(
@@ -61,10 +61,10 @@ export async function POST(request: Request) {
     const resend = getResend();
     const { data, error } = await resend.emails.send({
       from: "ServiceVision Contact <onboarding@resend.dev>",
-      to: process.env.CONTACT_EMAIL || "info@servicevision.net",
+      to: process.env.CONTACT_EMAIL || "info@servicevision.io",
       replyTo: email,
-      subject: `New contact from ${name}`,
-      react: ContactEmail({ name, email, message }),
+      subject: subject ? `[${subject}] from ${name}` : `New contact from ${name}`,
+      react: ContactEmail({ name, email, phone, company, subject, message }),
     });
 
     if (error) {
