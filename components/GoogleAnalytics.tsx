@@ -1,10 +1,25 @@
 "use client";
 
 import Script from "next/script";
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
+declare global {
+  interface Window {
+    gtag: (...args: unknown[]) => void;
+  }
+}
+
 export default function GoogleAnalytics() {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (!GA_MEASUREMENT_ID || typeof window.gtag === "undefined") return;
+    window.gtag("config", GA_MEASUREMENT_ID, { page_path: pathname });
+  }, [pathname]);
+
   if (!GA_MEASUREMENT_ID) {
     return null;
   }

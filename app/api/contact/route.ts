@@ -60,7 +60,7 @@ export async function POST(request: Request) {
 
     const resend = getResend();
     const { data, error } = await resend.emails.send({
-      from: "ServiceVision Contact <onboarding@resend.dev>",
+      from: process.env.RESEND_FROM_EMAIL || "ServiceVision Contact <onboarding@resend.dev>",
       to: process.env.CONTACT_EMAIL || "info@servicevision.io",
       replyTo: email,
       subject: subject ? `[${subject}] from ${name}` : `New contact from ${name}`,
