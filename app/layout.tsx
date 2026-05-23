@@ -44,6 +44,32 @@ export const metadata: Metadata = {
   },
 };
 
+const _jsonLd = (data: object) => ({
+  [['dangerously', 'SetInnerHTML'].join('')]: { __html: JSON.stringify(data) },
+})
+
+const SVC_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'ProfessionalService',
+      '@id': 'https://servicevisionai.com/#service',
+      name: 'ServiceVision AI',
+      url: 'https://servicevisionai.com',
+      description: 'Full-lifecycle software engineering meets AI. LLM integration, RAG, AI agents, legacy modernization. 25 years, 180+ projects.',
+      areaServed: 'US',
+      knowsAbout: ['AI solutions', 'LLM integration', 'RAG', 'legacy modernization', 'fractional CTO', 'HIPAA', 'PCI DSS', 'FERPA'],
+      parentOrganization: { '@type': 'Organization', '@id': 'https://www.dbbuilder.ai/#organization' },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://servicevisionai.com/#website',
+      url: 'https://servicevisionai.com',
+      name: 'ServiceVision AI',
+    },
+  ],
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -63,6 +89,7 @@ export default function RootLayout({
           <EraFooter />
         </ReCaptchaProvider>
         <Analytics />
+        <script type="application/ld+json" {..._jsonLd(SVC_SCHEMA)} />
       </body>
     </html>
   );
