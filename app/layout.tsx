@@ -16,27 +16,31 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "ServiceVision - AI-Powered Solutions for Service Organizations",
-    template: "%s | ServiceVision",
+    default: "ServiceVision AI - Enterprise Software & AI Solutions",
+    template: "%s | ServiceVision AI",
   },
   description:
-    "ServiceVision helps service organizations optimize operations and enhance client experiences through AI-powered technology solutions.",
-  keywords: ["AI", "service optimization", "technology solutions", "business development", "IT services"],
-  authors: [{ name: "ServiceVision" }],
+    "Full-lifecycle software engineering meets AI. From system design to scale—LLM integration, RAG, AI agents, and legacy modernization. 25 years, 180+ projects.",
+  keywords: ["AI solutions", "enterprise software", "LLM integration", "RAG", "AI agents", "legacy modernization", "systems integration", "software engineering"],
+  authors: [{ name: "ServiceVision AI" }],
+  metadataBase: new URL("https://servicevisionai.com"),
+  alternates: { canonical: "https://servicevisionai.com" },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://www.servicevision.net",
-    siteName: "ServiceVision",
-    title: "ServiceVision - AI-Powered Solutions for Service Organizations",
+    url: "https://servicevisionai.com",
+    siteName: "ServiceVision AI",
+    title: "ServiceVision AI - Enterprise Software & AI Solutions",
     description:
-      "ServiceVision helps service organizations optimize operations and enhance client experiences through AI-powered technology solutions.",
+      "Full-lifecycle software engineering meets AI. From system design to scale—LLM integration, RAG, AI agents, and legacy modernization. 25 years, 180+ projects.",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "ServiceVision AI" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ServiceVision - AI-Powered Solutions for Service Organizations",
+    title: "ServiceVision AI - Enterprise Software & AI Solutions",
     description:
-      "ServiceVision helps service organizations optimize operations and enhance client experiences through AI-powered technology solutions.",
+      "Full-lifecycle software engineering meets AI. From system design to scale—LLM integration, RAG, AI agents, and legacy modernization. 25 years, 180+ projects.",
+    images: ["/og-image.png"],
   },
 };
 
