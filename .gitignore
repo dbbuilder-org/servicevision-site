@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local working notes / artifacts (not site content)
+SESSION_CONTEXT*.md
+WhyRubrics*.PDF
