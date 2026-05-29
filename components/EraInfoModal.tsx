@@ -115,18 +115,82 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle, f
           {/* Purple accent bar */}
           <div className="h-1 bg-gradient-to-r from-purple-600 via-purple-400 to-purple-600" />
 
-          <div className="p-6 md:p-8">
+          {/* ===== MOBILE LAYOUT (< lg) ===== */}
+          <div className="p-4 sm:p-5 lg:hidden">
+            {/* Header row: Remember phrase + Toggle */}
+            <div className="flex items-center justify-between gap-3 mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/30 to-purple-600/20 border border-purple-500/30 flex items-center justify-center">
+                  <span className="text-base">⚡</span>
+                </div>
+                <div>
+                  <h2 className="text-sm font-bold text-white leading-tight">
+                    {rememberPhrases[eraYear] || `Remember ${eraName.replace(/ Era$/, '')}?`}
+                  </h2>
+                  <p className="text-[9px] text-purple-400 font-mono">{eraYear}</p>
+                </div>
+              </div>
+              {/* Compact toggle */}
+              <div className="flex items-center gap-2 bg-black/30 rounded-full px-2 py-1 border border-white/5">
+                <span className={`text-[10px] font-mono ${!showModern ? "text-white" : "text-gray-500"}`}>{eraYear}</span>
+                <button
+                  onClick={onToggle}
+                  className="relative w-10 h-5 rounded-full bg-[#1a1a1a] border border-purple-500/50"
+                  aria-label={showModern ? "Show retro version" : "Show modern version"}
+                >
+                  <div className={`absolute top-0.5 w-4 h-4 rounded-full transition-all duration-300 ${
+                    showModern
+                      ? "left-5 bg-gradient-to-r from-emerald-400 to-emerald-500"
+                      : "left-0.5 bg-gradient-to-r from-amber-400 to-orange-500"
+                  }`} />
+                </button>
+                <span className={`text-[10px] font-mono ${showModern ? "text-white" : "text-gray-500"}`}>2026</span>
+              </div>
+            </div>
+
+            {/* Condensed copy */}
+            <p className="text-white font-bold text-sm mb-1">We sure do.</p>
+            <p className="text-gray-300 text-xs leading-relaxed mb-2">
+              <span className="text-purple-400">ServiceVision</span> delivers transformation that used to take years in days.
+            </p>
+            <p className="text-emerald-400 text-xs leading-relaxed mb-3">
+              We built this site in <span className="text-white font-bold">under 12 hours</span> with one engineer + AI.
+            </p>
+            <p className="text-white font-medium text-xs mb-4">
+              Imagine what we could do for your business. <Link href="/contact" onClick={handleDismiss} className="text-purple-400">Let us show you →</Link>
+            </p>
+
+            {/* Horizontal buttons */}
+            <div className="flex gap-2">
+              <Link
+                href="/contact"
+                className="flex-1 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium px-3 py-2 rounded-lg text-center text-sm shadow-lg shadow-purple-500/30"
+                onClick={handleDismiss}
+              >
+                Let&apos;s Talk
+              </Link>
+              <button
+                onClick={handleDismiss}
+                className="flex-1 bg-white/5 text-gray-300 font-medium px-3 py-2 rounded-lg text-center text-sm border border-white/10"
+              >
+                Explore First
+              </button>
+            </div>
+          </div>
+
+          {/* ===== DESKTOP LAYOUT (lg+) ===== */}
+          <div className="hidden lg:block p-8">
             {/* 1/3 - 1/3 - 1/3 Grid Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+            <div className="grid grid-cols-3 gap-8">
 
               {/* Left 1/3: Header + Toggle */}
-              <div className="flex flex-col justify-start items-center lg:items-start">
+              <div className="flex flex-col justify-start">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/30 to-purple-600/20 border border-purple-500/30 flex items-center justify-center shadow-lg shadow-purple-500/20">
                     <span className="text-xl">⚡</span>
                   </div>
                   <div>
-                    <h2 className="text-base md:text-lg font-bold text-white">
+                    <h2 className="text-lg font-bold text-white">
                       {rememberPhrases[eraYear] || `Remember ${eraName.replace(/ Era$/, '')}?`}
                     </h2>
                     <p className="text-[10px] text-purple-400 font-mono">{eraYear}</p>
@@ -158,16 +222,16 @@ export default function EraInfoModal({ eraName, eraYear, showModern, onToggle, f
 
               {/* Center 1/3: Copy */}
               <div className="flex flex-col justify-start">
-                <p className="text-white font-bold text-base md:text-lg mb-2">We sure do.</p>
+                <p className="text-white font-bold text-lg mb-2">We sure do.</p>
                 <p className="text-gray-300 text-sm leading-relaxed mb-3">
-                  <span className="text-purple-400">ServiceVision AI</span> delivers transformation that used to take years in days—and with compliance-first, battle-tested code under the covers.
+                  <span className="text-purple-400">ServiceVision</span> delivers transformation that used to take years in days—and with compliance-first, battle-tested code under the hood.
                 </p>
-                <p className="text-gray-400 text-sm mb-2">You're looking at proof of our velocity and quality:</p>
+                <p className="text-gray-400 text-sm mb-2">You&apos;re looking at proof of our velocity and quality:</p>
                 <p className="text-emerald-400 text-sm leading-relaxed">
                   We built this site—interface, games, backend—in <span className="text-white font-bold">under 12 hours</span> with one senior engineer and our AI agents trained on our best practices.
                 </p>
-                <p className="text-white font-semibold text-sm md:text-base mt-3">
-                  Imagine what 12 hours with <span className="text-purple-400">ServiceVision</span> could do to revolutionize your <span className={`inline-block min-w-[70px] text-purple-400 transition-all duration-200 ${isRotating ? "opacity-90" : "opacity-100"}`}>{rotatingWords[currentWordIndex]}</span>.
+                <p className="text-white font-semibold text-base mt-3">
+                  Imagine what 12 hours with <span className="text-purple-400">ServiceVision</span> could do to revolutionize your business. <Link href="/contact" onClick={handleDismiss} className="text-purple-400 hover:text-purple-300 transition-colors">Let us show you →</Link>
                 </p>
               </div>
 

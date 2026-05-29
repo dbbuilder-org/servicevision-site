@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 import EraInfoModal from "./EraInfoModal";
+
+const AsteroidsGame = dynamic(() => import("@/components/AsteroidsGame"), {
+  ssr: false,
+});
 
 interface EraToggleProps {
   beforeYear: string;
@@ -16,6 +21,7 @@ interface EraToggleProps {
 export default function EraToggle({ beforeYear, beforeLabel, defaultModern = false, children }: EraToggleProps) {
   const [showModern, setShowModern] = useState(defaultModern);
   const [forceShowModal, setForceShowModal] = useState(false);
+  const [showAsteroids, setShowAsteroids] = useState(false);
 
   const handleToggle = () => setShowModern(!showModern);
 
@@ -29,6 +35,11 @@ export default function EraToggle({ beforeYear, beforeLabel, defaultModern = fal
 
   return (
     <div className="min-h-screen">
+      {/* Asteroids Game */}
+      {showAsteroids && (
+        <AsteroidsGame onClose={() => setShowAsteroids(false)} />
+      )}
+
       {/* Era Info Modal */}
       <EraInfoModal
         eraYear={beforeYear}
@@ -84,13 +95,14 @@ export default function EraToggle({ beforeYear, beforeLabel, defaultModern = fal
               </span>
             </div>
 
-            {/* Right: AI message - hidden on mobile */}
+            {/* Right: Play a game - hidden on mobile */}
             <div className="flex-1 hidden md:block text-right">
-              <p className="text-xs text-gray-400 leading-snug max-w-sm ml-auto">
-                {showModern
-                  ? <><span className="text-emerald-400">Any design, any code</span>—solved better and more reliably.</>
-                  : <>The <span className="text-purple-400">{beforeLabel.toLowerCase()}</span> aesthetic—a window into the past.</>}
-              </p>
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowAsteroids(true); }}
+                className="text-xs text-amber-400 hover:text-amber-300 transition-colors font-mono inline-flex items-center gap-1"
+              >
+                <span className="text-amber-400">&#9654;</span> Play a game?
+              </button>
             </div>
           </div>
         </div>
