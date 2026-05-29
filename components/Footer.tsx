@@ -9,6 +9,7 @@ interface NavItem {
 const navigation: {
   services: NavItem[];
   company: NavItem[];
+  divisions: { name: string; href: string }[];
   social: { name: string; href: string }[];
 } = {
   services: [
@@ -22,6 +23,12 @@ const navigation: {
     { name: "Our AI Capabilities", href: "/ai", isAI: true },
     { name: "Blog", href: "/blog" },
     { name: "Contact", href: "/contact" },
+  ],
+  divisions: [
+    { name: "SchoolVision", href: "https://schoolvision.ai" },
+    { name: "StartupVision", href: "https://startupvision.net" },
+    { name: "MobileID.ai", href: "https://mobileid.ai" },
+    { name: "Portfolio", href: "https://portfolio.servicevision.io" },
   ],
   social: [
     {
@@ -60,8 +67,27 @@ export default function Footer() {
           </span>
         </Link>
         <div className="mt-6 pt-4 border-t border-[#2a2a2a] text-center">
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mb-4">
+            {navigation.divisions.map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-gray-400 hover:text-emerald-400 transition-colors font-mono"
+              >
+                {item.name}
+              </a>
+            ))}
+          </div>
+          <p className="text-[11px] text-gray-600 font-mono mb-2">
+            built on the Vision Data Platform
+          </p>
           <p className="text-xs text-gray-600 font-mono">
             &copy; {new Date().getFullYear()} ServiceVision
+          </p>
+          <p className="mt-1 text-[11px] text-gray-600 font-mono">
+            A division of the DBBuilder constellation by Vision Companies
           </p>
         </div>
       </div>
@@ -73,7 +99,7 @@ export default function Footer() {
           <span className="text-emerald-400">$</span> cat footer.txt
         </div>
 
-        <div className="grid grid-cols-4 gap-12">
+        <div className="grid grid-cols-5 gap-12">
           {/* Brand column */}
           <div className="col-span-2">
             <Link href="/" className="inline-flex items-center gap-2 group">
@@ -90,6 +116,9 @@ export default function Footer() {
                 <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
                 <span>status: online</span>
               </div>
+              <p className="mt-3 text-gray-600">
+                <span className="text-gray-500">&gt;</span> built on the Vision Data Platform
+              </p>
             </div>
           </div>
 
@@ -111,6 +140,31 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
+          </div>
+
+          {/* Constellation / sibling divisions column */}
+          <div>
+            <h3 className="text-sm font-semibold text-white font-mono mb-4">
+              ./constellation
+            </h3>
+            <ul className="space-y-3">
+              {navigation.divisions.map((item) => (
+                <li key={item.name}>
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-gray-400 hover:text-emerald-400 transition-colors font-mono"
+                  >
+                    <span className="text-gray-600 mr-2">&gt;</span>
+                    {item.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-6 text-xs text-gray-600 font-mono leading-relaxed">
+              Four Stars. One Constellation.
+            </p>
           </div>
 
           {/* Company column */}
@@ -169,9 +223,14 @@ export default function Footer() {
         {/* Bottom section */}
         <div className="mt-16 pt-8 border-t border-[#2a2a2a]">
           <div className="flex flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-500 font-mono">
-              &copy; {new Date().getFullYear()} ServiceVision. All rights reserved.
-            </p>
+            <div>
+              <p className="text-sm text-gray-500 font-mono">
+                &copy; {new Date().getFullYear()} ServiceVision. All rights reserved.
+              </p>
+              <p className="mt-1 text-xs text-gray-600 font-mono">
+                A division of the DBBuilder constellation by Vision Companies &middot; Est. 2001 &middot; 25 years
+              </p>
+            </div>
             <div className="flex items-center gap-2 text-sm text-gray-500 font-mono">
               <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
               <span>10% of profits donated to tech-for-good orgs</span>

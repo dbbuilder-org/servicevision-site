@@ -45,7 +45,7 @@ const capabilities = [
 
 const stats = [
   { label: "years_in_business", value: "25", desc: "Years in Business" },
-  { label: "businesses_served", value: "3000+", desc: "Businesses Served" },
+  { label: "businesses_served", value: "5000+", desc: "Businesses Served" },
   { label: "products_launched", value: "50+", desc: "Products Launched" },
   { label: "saas_platforms", value: "20+", desc: "SaaS Platforms Built" },
 ];
@@ -102,8 +102,18 @@ const seniorQuestion = "Who treats this project like their own?";
 // The opening question - always shown first
 const openingQuestion = "Who can I call for enterprise-level help?";
 
-// Dot matrix intro lines - printed bidirectionally like old printers
-const dotMatrixLines = [
+// Dot matrix intro lines - different versions for mobile vs desktop
+const dotMatrixLinesMobile = [
+  "Your dedicated team of Advisors,",
+  "Developers, Engineers, Marketers,",
+  "Testers, Product Managers, Consultants.",
+  "Decades of enterprise expertise",
+  "meets cutting-edge AI.",
+  "Real People x Extraordinary Tech",
+  "= Measurable ROI.",
+];
+
+const dotMatrixLinesDesktop = [
   "Your dedicated team of Advisors, Developers, Engineers,",
   "      Marketers, Testers, Product Managers, and Consultants.",
   "         Decades of enterprise expertise meets cutting-edge AI.",
@@ -149,6 +159,10 @@ export default function Home() {
   const [secretCode, setSecretCode] = useState("");
   const [landedOnFinal, setLandedOnFinal] = useState(false);
 
+  // Mobile detection for responsive dot matrix
+  const [isMobile, setIsMobile] = useState(false);
+  const dotMatrixLines = isMobile ? dotMatrixLinesMobile : dotMatrixLinesDesktop;
+
   // "We have the answers" reveal state - shows after 5 seconds
   const [showAnswers, setShowAnswers] = useState(false);
   const answersShown = useRef(false);
@@ -172,6 +186,14 @@ export default function Home() {
   const [showQASection, setShowQASection] = useState(false);
   const [printingComplete, setPrintingComplete] = useState(false);
   const answersBoxRef = useRef<HTMLDivElement>(null);
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Set up questions: opening question first, shuffle middle, end with senior question
   useEffect(() => {
@@ -453,9 +475,14 @@ export default function Home() {
         <div className="relative flex-1 flex items-center mx-auto max-w-7xl px-6 pt-24 pb-8 lg:px-8 w-full">
           <div className="max-w-4xl">
             {/* Part 1: "You have the questions..." */}
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-8">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3">
               You have the questions...
             </h1>
+
+            {/* Parent attribution */}
+            <p className="text-xs sm:text-sm text-gray-500 font-mono mb-8">
+              <span className="text-emerald-400">&gt;</span> A division of the DBBuilder constellation by Vision Companies
+            </p>
 
             {/* Terminal Window - Shows rotating questions */}
             <div className="terminal-window animate-terminal-glow mb-4">
@@ -466,8 +493,8 @@ export default function Home() {
 
               <div className="terminal-body">
                 <div className="flex items-start gap-2">
-                  <span className="phosphor-text text-xl sm:text-2xl lg:text-3xl font-bold font-mono">&gt;</span>
-                  <span className="phosphor-text text-xl sm:text-2xl lg:text-3xl font-bold font-mono whitespace-nowrap">
+                  <span className="phosphor-text text-xl sm:text-2xl lg:text-3xl font-bold font-mono shrink-0">&gt;</span>
+                  <span className="phosphor-text text-xl sm:text-2xl lg:text-3xl font-bold font-mono break-words sm:whitespace-nowrap">
                     {displayedText}
                     <span className={`inline-block w-2.5 sm:w-3 h-6 sm:h-7 bg-emerald-400 ml-1 ${showAnswers ? '' : 'animate-blink'}`} />
                   </span>
@@ -486,7 +513,7 @@ export default function Home() {
 
             {/* Part 2: "We have the answers." - revealed after landing on final question */}
             {showAnswers && (
-              <div className="flex justify-end -mr-16 lg:-mr-32 xl:-mr-48">
+              <div className="flex justify-end sm:-mr-16 lg:-mr-32 xl:-mr-48">
                 <div className="max-w-2xl w-full">
                   <div className="mt-8 mb-10" />
                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-8 animate-fade-in">
@@ -494,11 +521,12 @@ export default function Home() {
                   </h2>
 
                   {/* Answer Box with Dot Matrix Intro + Scrollable Q&A */}
-                  <div className="bg-[#111] border border-[#333] rounded-lg p-6 mb-10 font-mono">
-                  {/* Dot Matrix Intro - first 2 lines left, last 2 lines right */}
+                  <div className="bg-[#111] border border-[#333] rounded-lg p-4 sm:p-6 mb-10 font-mono">
+                  {/* Dot Matrix Intro - first 2 lines left, last 2 lines right (desktop only) */}
                   <div className="space-y-1">
                     {dotMatrixLines.map((line, index) => {
-                      const isRightJustified = index >= 2; // Lines 2 and 3 (0-indexed) are right justified
+                      // Right-justify last 2 lines on desktop only (desktop has 4 lines, mobile has 7)
+                      const isRightJustified = !isMobile && index >= 2;
                       const displayedLine = printedLines[index] || "";
                       const isCurrentLine = index === currentLineIndex && isPrinting;
                       const isComplete = index < currentLineIndex || (index === currentLineIndex && currentCharIndex >= line.length);
@@ -509,7 +537,7 @@ export default function Home() {
                       return (
                         <div
                           key={index}
-                          className={`text-sm leading-relaxed tracking-wide ${
+                          className={`text-xs sm:text-sm leading-relaxed tracking-wide ${
                             isRightJustified ? "text-right" : "text-left"
                           }`}
                         >
@@ -586,31 +614,31 @@ export default function Home() {
                   )}
                   </div>
 
-                  {/* Get to know us section - below the answers terminal, stair-stepped right */}
+                  {/* Get to know us section - below the answers terminal, stair-stepped right on larger screens */}
                   {printingComplete && (
-                    <div className="mt-12 mb-8 ml-auto -mr-12 lg:-mr-24 xl:-mr-32 max-w-md">
-                      <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-8">Get to know us.</h3>
-                      <div className="bg-[#111] border border-[#333] rounded-lg px-4 py-3 font-mono text-sm space-y-3">
-                        <div>
-                          <span className="text-gray-500">GOTO:</span>{" "}
+                    <div className="mt-12 mb-8 ml-auto sm:-mr-12 lg:-mr-24 xl:-mr-32 max-w-md">
+                      <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-8">Get to know us.</h3>
+                      <div className="bg-[#111] border border-[#333] rounded-lg px-4 py-3 font-mono text-xs sm:text-sm space-y-3">
+                        <div className="flex flex-wrap gap-x-3 gap-y-1">
+                          <span className="text-gray-500">GOTO:</span>
                           <Link
                             href="/services"
                             className="text-emerald-400 hover:text-amber-400 transition-colors"
                           >
                             <span className="underline">S</span>ervices
-                          </Link>{" "}
+                          </Link>
                           <Link
                             href="/portfolio"
                             className="text-emerald-400 hover:text-amber-400 transition-colors"
                           >
                             <span className="underline">P</span>ortfolio
-                          </Link>{" "}
+                          </Link>
                           <Link
                             href="/library"
                             className="text-emerald-400 hover:text-amber-400 transition-colors"
                           >
                             <span className="underline">L</span>ibrary
-                          </Link>{" "}
+                          </Link>
                           <Link
                             href="/ai"
                             className="text-purple-400 hover:text-purple-300 transition-colors"
